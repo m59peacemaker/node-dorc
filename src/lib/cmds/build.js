@@ -4,13 +4,7 @@ const format = require('chalk')
 const split = require('split')
 const prefixLines = require('prefix-stream-lines')
 const through = require('throo')
-const pify = require('pify-proto')
-const docker = pify(require('docker-remote-api')())
-
-const getImage = (nameOrId) => docker.get(`/images/${nameOrId}/json`, {json: true})
-const getImages = docker.get('/images/json', {json: true})
-
-const rmi = (id) => docker.delete(`/images/${id}`, {json: true})
+const docker = require('../docker-api')
 
 const color = (c) => {
   return through((push, chunk, enc, cb) => {
@@ -50,12 +44,12 @@ const buildImage = (serviceName, image) => new Promise((resolve, reject) => {
 
 const removeDangling = (imagesThatMatchedTags) => {
   return Promise.all(imagesThatMatchedTags
-    .map(image => getImage(image.Id).then(info => {
+    .map(image => docker.getImage(image.Id).then(info => {
       if (!info.RepoTags.length) { // no longer tagged (is dangling)
         process.stdout.write(
           `Removing dangling image ${info.Id}, previously tagged "${image.RepoTags.join(' ')}"\n`
         )
-        return rmi(info.Id)
+        return docker.rmi(info.Id)
       }
       return Promise.resolve()
     }))
@@ -63,8 +57,7 @@ const removeDangling = (imagesThatMatchedTags) => {
 }
 
 const buildImageAndRemoveDangling = async (serviceName, image) => {
-  const imagesThatMatchTags = await Promise.all(image.tags.map(tag => getImage(tag)))
-  const imageIdsThatMatchTags = imagesThatMatchTags.map(info => info.Id)
+  const imagesThatMatchTags = await Promise.all(image.tags.map(tag => docker.getImage(tag)))
   await buildImage(serviceName, image)
   await removeDangling(imagesThatMatchTags)
   return
@@ -92,36 +85,24 @@ const buildImages = toBuild => {
   }, Promise.resolve())
 }
 
-const build = (config, {services = []}) => {
-  const selectedServices = R.ifElse(
-    () => R.isEmpty(services), // no services specified
-    () => config.services, // use all of them
-    () => R.pipe( // filter config down to given services
-      R.toPairs,
-      R.filter(([name]) => services.includes(name)),
-      R.fromPairs
-    )(config.services)
-  )()
-  const toBuild = R.pipe(
-    R.toPairs,
-    // just handle image property
-    R.map(([name, value]) => [name, value.image]),
-    // filter out image settings that are strings (nothing to build)
-    R.filter(([name, value]) => value && typeof value !== 'string'),
-    // normalize to array of objects rather than having to check for array/object in further code
-    //   because the image setting can specify multiple images to build
-    R.map(([name, value]) => Array.isArray(value) ? [name, value] : [name, [value]]),
-    // normalize image.tag to array
-    R.map(([name, images]) => [
-      name,
-      images.map(image => R.over(
-        R.lensProp('tags'),
-        (x => Array.isArray(x) ? x : [x]),
-        image
-      ))
-    ])
-  )(selectedServices)
-  return buildImages(toBuild)
+const filter = R.pipe(
+  R.toPairs,
+  R.map(
+    R.over(
+      R.lensIndex(1),
+      R.view(R.lensProp('image'))
+    )
+  ),
+  R.filter(
+    R.pipe(
+      R.view(R.lensIndex(1)),
+      R.both(Array.isArray, R.complement(R.isEmpty))
+    )
+  )
+)
+
+const build = (selectedServices, config) => {
+  return buildImages(filter(selectedServices))
 }
 
 module.exports = build

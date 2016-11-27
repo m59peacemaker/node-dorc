@@ -1,8 +1,13 @@
+const path = require('path')
 const {readFile} = require('mz/fs')
 const {safeLoad: parseYAML} = require('js-yaml')
 const interpolate = require('interpol8')
 const interpolateShell = require('./interpolate-shell')
 const getModeConfig = require('./get-mode-config')
+
+const defaults = {
+  projectName: path.basename(process.cwd())
+}
 
 const getLocals = (env, localsFile) => {
   if (localsFile === undefined) {
@@ -31,10 +36,10 @@ const getConfig = async (mode) => {
   // interpolate {{ }} placeholders in raw config
   const doc__ = interpolate(doc_, locals)
   // parse interpolated config into js object
-  const config = parseYAML(doc__)
+  const config = Object.assign({}, defaults, parseYAML(doc__))
   // merge config objects with mode specific objects,
   //   so that we have only the config for the given mode
-  const modeConfig = getModeConfig(mode, config)
+  const modeConfig = getModeConfig(mode || config.defaultMode, config)
   return modeConfig
 }
 

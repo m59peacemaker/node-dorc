@@ -7,6 +7,9 @@ const {readFile} = require('mz/fs')
 const getConfig = require('./lib/get-config')
 const yargs = require('yargs')
 const format = require('chalk')
+const filterSelectedServices = require('./lib/filter-selected-services')
+const normalizeConfig = require('./lib/normalize-config')
+const tryCatch = require('try_catch')
 
 process.on('unhandledRejection', (reason) => {
   console.error('unhandled rejection:'.toUpperCase(), reason)
@@ -14,8 +17,10 @@ process.on('unhandledRejection', (reason) => {
 })
 
 const cmds = {
+  build: require('./lib/cmds/build'),
   up: require('./lib/cmds/up'),
-  build: require('./lib/cmds/build')
+  down: require('./lib/cmds/down'),
+  logs: require('./lib/cmds/logs')
 }
 
 const handler = async (name, args = {}) => {
@@ -24,20 +29,19 @@ const handler = async (name, args = {}) => {
     process.exit(0)
   }
   args.services = args._.slice(1)
-  const config = await getConfig(args.mode)
+  const _config = await getConfig(args.mode)
+  const config = normalizeConfig(_config)
+  const selectedServices = filterSelectedServices(config.services, args.services)
   const handler = cmds[name]
-  handler(config, args)
+  handler(selectedServices, config, args)
 }
 
-const assertArgsValid = (args) => {
-  if (args.cmd === undefined) {
-    console.error('no command given')
-    process.exit(1)
+const assertCmdValid = (cmd) => {
+  if (cmd === undefined) {
+    throw new Error('no command given')
   }
-
-  if (!cmds.hasOwnProperty(args.cmd)) {
-    console.error(`"${args.cmd}" is not a valid command`)
-    process.exit(1)
+  if (!cmds.hasOwnProperty(cmd)) {
+    throw new Error(`"${cmd}" is not a valid command`)
   }
 }
 
@@ -62,13 +66,34 @@ const args = yargs.usage('\nUsage: $0 [options] <command> [services...]')
   .command({
     command: 'up',
     desc: 'start service(s)',
-    handler: (args) => handler('build', args)
+    handler: (args) => handler('up', args),
+    builder: (y) => {
+      return y
+      .option('d', {
+        alias: 'detached',
+        describe: 'start services in background',
+        type: 'boolean'
+      })
+    }
+  })
+  .command({
+    command: 'down',
+    desc: 'stop service(s) and remove container(s)',
+    handler: (args) => handler('down', args)
+  })
+  .command({
+    command: 'logs',
+    desc: 'connect to logs',
+    handler: (args) => handler('logs', args)
   })
   .argv
 
-const cmdArg = args._[0]
-if (!cmds.hasOwnProperty(cmdArg)) {
-  console.error(format.red(`"${cmdArg}" is not a valid command`))
-  yargs.showHelp()
-  process.exit(1)
-}
+const cmd = args._[0]
+tryCatch(
+  () => assertCmdValid(cmd),
+  err => {
+    console.error(format.red(err.message))
+    yargs.showHelp()
+    process.exit(1)
+  }
+)
