@@ -16,7 +16,7 @@ const rm = (containerName) => new Promise((resolve, reject) => {
 
 const down = async (services, config) => {
   return Promise.all(R.toPairs(services).map(([serviceName, service]) => {
-    const containerName = `${config.projectName}_${serviceName}`
+    const containerName = `${config.project.name}_${serviceName}`
     return stop(containerName, serviceName)
       .then(() => rm(containerName))
       .then(() => {

@@ -57,9 +57,11 @@ const removeDangling = (imagesThatMatchedTags) => {
 }
 
 const buildImageAndRemoveDangling = async (serviceName, image) => {
-  const imagesThatMatchTags = await Promise.all(image.tags.map(tag => docker.getImage(tag)))
+  const imagesThatMatchTags = await Promise.all(image.tags.map(tag => {
+    return docker.getImage(tag).catch(err => undefined)
+  }))
   await buildImage(serviceName, image)
-  await removeDangling(imagesThatMatchTags)
+  await removeDangling(imagesThatMatchTags.filter(v => v !== undefined))
   return
 }
 

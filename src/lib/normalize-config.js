@@ -10,14 +10,18 @@ const normalize = R.over(
     R.map(
       R.over(
         R.lensIndex(1),
-        R.over(R.lensProp('image'), R.ifElse(
-          R.is(String),
+        R.ifElse(
+          R.compose(R.isNil, R.prop('image')),
           R.identity,
-          R.pipe(
-            ensureArray,
-            R.map(R.over(R.lensProp('tags'), ensureArray))
-          )
-        ))
+          R.over(R.lensProp('image'), R.ifElse(
+            R.is(String),
+            R.identity,
+            R.pipe(
+              ensureArray,
+              R.map(R.over(R.lensProp('tags'), ensureArray))
+            )
+          ))
+        )
       )
     ),
     R.fromPairs

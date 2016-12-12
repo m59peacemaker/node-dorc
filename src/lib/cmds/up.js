@@ -1,4 +1,4 @@
-const {spawn} = require('child_process')
+const {exec} = require('child_process')
 const R = require('ramda')
 const path = require('path')
 const tryHook = require('../try-hook')
@@ -12,7 +12,7 @@ const dorcArgs = [
   'mode',
   'hooks',
   'image',
-  'command'
+  'cmd'
 ]
 
 const propTransforms = {
@@ -43,7 +43,7 @@ const getTransform = prop => {
   }
 }
 
-const makeRunArgs = (service, containerName) => {
+const makeRunArgs = (service, containerName, detached = false) => {
   const dockerRunProps = R.pipe(
     () => service,
     R.omit(dorcArgs),
@@ -53,27 +53,32 @@ const makeRunArgs = (service, containerName) => {
   const options = dockerRunProps.map(([key, value]) => {
     return getTransform(key)(value, key)
   })
-  const args = R.flatten([options, service.image, service.command || ''])
+  const cmd = R.ifElse(R.isNil, R.F, R.identity)(service.cmd)
+  const detachedArg = R.ifElse(R.equals(false), R.identity, R.always('-d'))(detached)
+  const args = R.flatten(['-it', detachedArg, options, service.image, cmd])
     .filter(v => v)
   return args
 }
 
-const startService = (service, containerName) => new Promise((resolve, reject) => {
-  const args = ['run', '-d', ...makeRunArgs(service, containerName)]
-  process.stdout.write(`  > docker ${args.join(' ')}\n\n`)
-  const p = spawn('docker', args)
+const startService = (service, containerName, _args) => new Promise((resolve, reject) => {
+  const args = ['run', ...makeRunArgs(service, containerName, true)]
+  const cmd = `docker ${args.join(' ')}`
+  process.stdout.write(`  > ${cmd}\n\n`)
+  const p = exec(cmd)
   p.stderr.pipe(process.stderr)
   p.on('close', exitCode => {
     exitCode !== 0 ? reject(exitCode) : resolve()
   })
 })
 
-const startServices = (services, config) => Promise.all(R.pipe(
+const startServices = (services, config, args) => Promise.all(R.pipe(
   R.toPairs,
   R.addIndex(R.map)(([name, service], idx) => {
-    const containerName = `${config.projectName}_${name}`
+    const containerName = `${config.project.name}_${name}`
     return tryHook('before-up', service, name)
-      .then(() => startService(service, containerName))
+      .then(() => {
+        return startService(service, containerName, args)
+      })
       .then(() => {
         process.stdout.write(`${tick} ${name} is up\n`)
       })
@@ -83,29 +88,30 @@ const startServices = (services, config) => Promise.all(R.pipe(
   })
 )(services))
 
-const prepare = R.map(
-  R.over(
-    R.lensProp('image'),
-    R.ifElse(
-      R.is(String),
-      R.identity,
-      R.pipe(
-        R.nth(-1),
-        R.prop('tags'),
-        R.nth(0)
-      )
+const prepare = R.over(
+  R.lensProp('image'),
+  R.ifElse(
+    R.is(String),
+    R.identity,
+    R.pipe(
+      R.nth(-1),
+      R.prop('tags'),
+      R.nth(0)
     )
   )
 )
 
 const up = async (services, config, args) => {
   await build(services, config)
-  return startServices(prepare(services), config, args)
+  return startServices(R.map(prepare)(services), config, args)
     .then(() => {
       if (args.detached !== true) {
         return connectLogs(services, config)
       }
     })
 }
+
+up.prepare = prepare
+up.makeRunArgs = makeRunArgs
 
 module.exports = up

@@ -4,43 +4,83 @@ const {safeLoad: parseYAML} = require('js-yaml')
 const interpolate = require('interpol8')
 const interpolateShell = require('./interpolate-shell')
 const getModeConfig = require('./get-mode-config')
+const R = require('ramda')
+const normalizeConfig = require('./normalize-config')
+const {Future} = require('ramda-fantasy')
+const promisifyF = require('promisify-f')
+const futurizeP = require('futurize-p')(Future)
 
-const defaults = {
-  projectName: path.basename(process.cwd())
-}
+const getDefaults = (projectPath) => ({
+  projectName: path.basename(projectPath)
+})
 
-const getLocals = (env, localsFile) => {
+const getLocals = (localsFile) => {
   if (localsFile === undefined) {
-    return Promise.resolve(env)
+    return Promise.resolve({})
   }
   return readFile(localsFile)
-    .then((locals) => Object.assign({}, env, parseYAML(locals)))
-    .catch(err => env)
+    .then(raw => parseYAML(raw))
+    .catch(err => ({}))
 }
 
-const getConfig = async (mode) => {
+const interpolateConfig = async (raw, locals) => {
+  // interpolate ${{ }} shell placeholders in raw config
+  const doc_ = await interpolateShell(raw)
+  // interpolate {{ }} placeholders in raw config
+  return interpolate(doc_, Object.assign({}, process.env, locals))
+}
+
+const getConfig = async (projectPath, mode) => {
   // read dorc.yaml
-  let configDoc
+  const configDocPath = path.join(projectPath, 'dorc.yaml')
+  let raw
   try {
-    configDoc = await readFile('dorc.yaml', 'utf8')
+    raw = await readFile(configDocPath, 'utf8')
   } catch (err) {
-    console.log(`No dorc.yaml found at ${process.cwd()}`)
+    process.stdout.write(`No dorc.yaml found at ${projectPath}\n`)
     process.exit(1)
   }
   // parse into js object so we can get locals file path
-  const preInterpolateConfig = parseYAML(configDoc)
-  // read object from config.locals file and merge it with environment vars
-  const locals = await getLocals(process.env, preInterpolateConfig.locals)
-  // interpolate ${{ }} shell placeholders in raw config
-  const doc_ = await interpolateShell(configDoc)
-  // interpolate {{ }} placeholders in raw config
-  const doc__ = interpolate(doc_, locals)
-  // parse interpolated config into js object
-  const config = Object.assign({}, defaults, parseYAML(doc__))
+  const preInterpolateConfig = parseYAML(raw)
+  const locals = await getLocals(preInterpolateConfig.locals)
+  const interpolated = await interpolateConfig(raw, locals)
+  const parsed = Object.assign({}, getDefaults(projectPath), parseYAML(interpolated))
   // merge config objects with mode specific objects,
   //   so that we have only the config for the given mode
-  const modeConfig = getModeConfig(mode || config.defaultMode, config)
-  return modeConfig
+  const modeConfig = getModeConfig(mode || parsed.defaultMode, parsed)
+  // filter services that don't have an image
+  const prepare = R.pipe(
+    R.over(
+      R.lensProp('services'),
+      R.filter(R.has('image'))
+    ),
+    /*R.lensProp('with')(
+      R.ifElse(
+        R.isNil,
+        Future.of,
+        futurizeP(paths => Promise.all(
+          paths.map(path => getConfig(path, mode || parsed.defaultMode))
+        ))
+      )
+    ),
+    R.map(normalizeConfig)*/
+    normalizeConfig
+  )
+
+  //const prepared = await promisifyF(prepare)(modeConfig)
+  const prepared = prepare(modeConfig)
+
+  const projectConfig = {
+    project: {
+      path: projectPath,
+      name: parsed.projectName
+    },
+    locals,
+    raw,
+    parsed,
+    prepared
+  }
+  return projectConfig
 }
 
 module.exports = getConfig

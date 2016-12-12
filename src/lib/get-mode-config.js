@@ -16,7 +16,7 @@ const collapsers = {
 
 const getModeConfig = (mode, config) => R.mapObjIndexed(
   (value, key) => {
-    const fn = R.view(R.lensProp(key), collapsers)
+    const fn = R.prop(key)(collapsers)
     return fn ? fn(mode, value) : value
   },
   config

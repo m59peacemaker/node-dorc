@@ -8,19 +8,19 @@ const getConfig = require('./lib/get-config')
 const yargs = require('yargs')
 const format = require('chalk')
 const filterSelectedServices = require('./lib/filter-selected-services')
-const normalizeConfig = require('./lib/normalize-config')
 const tryCatch = require('try_catch')
 
 process.on('unhandledRejection', (reason) => {
-  console.error('unhandled rejection:'.toUpperCase(), reason)
-  process.exit(1)
+  console.error('unhandled rejection:'.toUpperCase())
+  throw reason
 })
 
 const cmds = {
   build: require('./lib/cmds/build'),
   up: require('./lib/cmds/up'),
   down: require('./lib/cmds/down'),
-  logs: require('./lib/cmds/logs')
+  logs: require('./lib/cmds/logs'),
+  sh: require('./lib/cmds/sh')
 }
 
 const handler = async (name, args = {}) => {
@@ -29,11 +29,10 @@ const handler = async (name, args = {}) => {
     process.exit(0)
   }
   args.services = args._.slice(1)
-  const _config = await getConfig(args.mode)
-  const config = normalizeConfig(_config)
-  const selectedServices = filterSelectedServices(config.services, args.services)
+  const config = await getConfig(process.cwd(), args.mode)
+  const selectedServices = filterSelectedServices(config.prepared.services, args.services)
   const handler = cmds[name]
-  handler(selectedServices, config, args)
+  return handler(selectedServices, config, args)
 }
 
 const assertCmdValid = (cmd) => {
@@ -85,6 +84,11 @@ const args = yargs.usage('\nUsage: $0 [options] <command> [services...]')
     command: 'logs',
     desc: 'connect to logs',
     handler: (args) => handler('logs', args)
+  })
+  .command({
+    command: 'sh <service>',
+    desc: 'container /bin/sh',
+    handler: (args) => handler('sh', args)
   })
   .argv
 
