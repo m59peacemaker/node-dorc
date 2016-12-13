@@ -10,7 +10,7 @@ const sh = (services, config, {service: serviceName}) => {
     .then(() => {
       spawn('docker', ['exec', '-it', name, '/bin/sh'], {stdio: 'inherit'})
     })
-    .catch(() => {
+    .catch(err => {
       const args = ['run', ...makeRunArgs(prepare(service), name), '/bin/sh']
       const cmd = `docker ${args.join(' ')}`
       console.log(cmd)
