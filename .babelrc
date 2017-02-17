@@ -1,4 +1,11 @@
 {
   "presets": ["es2017"],
-  "plugins": ["syntax-object-rest-spread", "transform-object-rest-spread", "transform-es2015-destructuring"]
+  "plugins": [
+    "syntax-object-rest-spread",
+    "transform-object-rest-spread",
+    "transform-es2015-destructuring",
+    ["root-require", {
+      "projectRoot": "src"
+    }]
+  ]
 }

@@ -15,13 +15,18 @@ process.on('unhandledRejection', (reason) => {
   throw reason
 })
 
-const cmds = {
-  build: require('./lib/cmds/build'),
-  up: require('./lib/cmds/up'),
-  down: require('./lib/cmds/down'),
-  logs: require('./lib/cmds/logs'),
-  sh: require('./lib/cmds/sh')
-}
+const cmds = [
+  //'build',
+  'run'
+  //'up',
+  //'down',
+  //'follow',
+  //'sh',
+  //'task'
+].reduce((cmds, cmd) => {
+  cmds[cmd] = require('./cmds/' + cmd)
+  return cmds
+}, {})
 
 const handler = async (name, args = {}) => {
   if (args.h === true) {

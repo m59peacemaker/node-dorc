@@ -1,0 +1,9 @@
+catch and formalize no dorc.yaml error
+add a --print option to just print the command rather than run it
+build [service]
+run {service} {cmd}
+task {service} {task} {args} // list services if none given, list tasks if none given
+  dorc task db patch 7.sql
+sh {service} - shell into service
+up [service] - build && run
+follow [service] - docker logs --tail 10 --follow

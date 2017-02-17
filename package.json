@@ -6,7 +6,9 @@
   },
   "scripts": {
     "build": "babel ./src --out-dir ./build --source-maps inline",
-    "watch": "onchange -i src -- npm run build"
+    "test": "tape ./build/**/*.test.js",
+    "build-test": "npm run build && npm run test",
+    "watch": "onchange -i src -- npm run build-test --silent"
   },
   "license": "VOL",
   "dependencies": {
@@ -32,10 +34,13 @@
   },
   "devDependencies": {
     "babel-cli": "^6.18.0",
+    "babel-plugin-root-require": "^1.1.1",
     "babel-plugin-syntax-object-rest-spread": "^6.13.0",
     "babel-plugin-transform-es2015-destructuring": "^6.18.0",
     "babel-plugin-transform-object-rest-spread": "^6.16.0",
     "babel-preset-es2017": "^6.16.0",
-    "onchange": "^3.0.2"
+    "onchange": "^3.0.2",
+    "output-file-sync": "^1.1.2",
+    "tape": "^4.6.3"
   }
 }
