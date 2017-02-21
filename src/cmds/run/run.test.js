@@ -1,31 +1,52 @@
-const test = require('tape')
-const outputFile = require('output-file-sync')
-const {join: joinPath} = require('path')
 const {exec, execSync} = require('child_process')
+const {
+  test,
+  cmd,
+  tmpDir,
+  setup,
+  cleanup
+} = require('~/test')
 
-const cmd = require.resolve('~/cmd.js')
-const tmpDir = '/tmp/dorc'
-const setup = config => {
-  outputFile(joinPath(tmpDir, '/dorc.yaml'), config)
-}
-
-test('"run {service}" starts the container with default command', t => {
+test('"run {service}" runs service with default command', t => {
   t.plan(1)
   const config = `
     services:
-      foo:
+      hello:
         image: pmkr/hello:1.0
   `
   setup(config)
-  exec(`${cmd} run foo`, (err, stdout, stderr) => {
+  exec(`${cmd} run hello`, {cwd: tmpDir}, (err, stdout, stderr) => {
     if (err) {
       t.fail(err)
-    } else if (stderr === undefined && stdout.trim === 'Hello, World!') {
+    } else if (stderr === '' && stdout.split('\n').includes('Hello, World!')) {
       t.pass()
     } else {
       console.log('stdout:', stdout)
       console.error('stderr:', stderr)
       t.fail('Wrong output')
     }
+    cleanup()
+  })
+})
+
+test('"run {service} {cmd}" runs service with {cmd}"', t => {
+  t.plan(1)
+  const config = `
+    services:
+      hello:
+        image: pmkr/hello:1.0
+  `
+  setup(config)
+  exec(`${cmd} run hello Darkness, my old friend`, {cwd: tmpDir}, (err, stdout, stderr) => {
+    if (err) {
+      t.fail(err)
+    } else if (stderr === '' && stdout.split('\n').includes('Hello, Darkness, my old friend')) {
+      t.pass()
+    } else {
+      console.log('stdout:', stdout)
+      console.error('stderr:', stderr)
+      t.fail('Wrong output')
+    }
+    cleanup()
   })
 })

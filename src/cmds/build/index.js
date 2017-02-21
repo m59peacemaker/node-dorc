@@ -4,7 +4,7 @@ const format = require('chalk')
 const split = require('split')
 const prefixLines = require('prefix-stream-lines')
 const through = require('throo')
-const docker = require('../docker-api')
+const docker = require('~/lib/docker-api')
 
 const color = (c) => {
   return through((push, chunk, enc, cb) => {
@@ -42,27 +42,29 @@ const buildImage = (serviceName, image) => new Promise((resolve, reject) => {
     .on('close', exitCode => exitCode === 0 ? resolve() : reject(exitCode))
 })
 
-const removeDangling = (imagesThatMatchedTags) => {
-  return Promise.all(imagesThatMatchedTags
-    .map(image => docker.getImage(image.Id).then(info => {
+const removeDangling = (outputMessage, images) => Promise.all(
+  images.map(image => docker.getImage(image.Id)
+    .then(info => {
       if (!info.RepoTags.length) { // no longer tagged (is dangling)
-        process.stdout.write(
-          `Removing dangling image ${info.Id}, previously tagged "${image.RepoTags.join(' ')}"\n`
+        outputMessage(
+          `Removing dangling image ${info.Id}, previously tagged "${image.RepoTags.join(' ')}"`
         )
         return docker.rmi(info.Id)
+          .then(() => outputMessage(`Image ${info.Id} removed`))
       }
       return Promise.resolve()
-    }))
+    })
   )
-}
+)
 
 const buildImageAndRemoveDangling = async (serviceName, image) => {
-  const imagesThatMatchTags = await Promise.all(image.tags.map(tag => {
-    return docker.getImage(tag).catch(err => undefined)
-  }))
+  const imagesThatMatchTags = await Promise.all(
+    image.tags
+      .map(tag => docker.getImage(tag).catch(err => undefined))
+      .filter(v => v !== undefined)
+  )
   await buildImage(serviceName, image)
-  await removeDangling(imagesThatMatchTags.filter(v => v !== undefined))
-  return
+  await removeDangling(imagesThatMatchTags)
 }
 
 const buildImages = toBuild => {
@@ -87,7 +89,7 @@ const buildImages = toBuild => {
   }, Promise.resolve())
 }
 
-const filter = R.pipe(
+/*const filter = R.pipe(
   R.toPairs,
   R.map(
     R.over(
@@ -101,10 +103,11 @@ const filter = R.pipe(
       R.both(Array.isArray, R.complement(R.isEmpty))
     )
   )
-)
+)*/
 
-const build = (selectedServices, config) => {
-  return buildImages(filter(selectedServices))
+const build = (selectedServices, config, args) => {
+  console.log(selectedServices)
+  //return buildImages(filter(selectedServices))
 }
 
 module.exports = build

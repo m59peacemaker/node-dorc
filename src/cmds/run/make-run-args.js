@@ -1,4 +1,10 @@
+const {
+  join: joinPath,
+  isAbsolute: isAbsolutePath
+} = require('path')
+const {homedir: getHomedir} = require('os')
 const R = require('ramda')
+const expandTilde = require('expand-tilde')
 const moveProps = require('~/lib/move-props')
 const mergeProps = require('~/lib/merge-props')
 
@@ -10,15 +16,17 @@ const dorcArgs = [
 ]
 
 const propTransforms = {
-  volumes: value => {
+  volumes: (value, prop, dirs) => {
     return value.map(v => {
-      if (!path.isAbsolute(v)) {
-        return ['-v', path.join(process.cwd(), v)]
+      v = expandTilde(v, dirs.homedir)
+      if (!isAbsolutePath(v)) {
+        return ['-v', joinPath(dirs.cwd, v)]
+      } else {
+        return ['-v', v]
       }
-      return ['-v', value]
     })
   },
-  env: value => R.toPairs(value).map(([k, v]) => ['-e', `${k}=${v}`]),
+  env: value => R.toPairs(value).map(([k, v]) => ['-e', `${k}="${v}"`]),
   ports: value => value.map(v => ['-p', v])
 }
 
@@ -37,26 +45,45 @@ const getTransform = prop => {
   }
 }
 
-const transformDockerOptions = R.pipe(
-  R.toPairs,
-  R.map(([key, value]) => getTransform(key)(value, key)),
-  R.flatten
-)
+const transformDockerOptions = dirs => {
+  return R.pipe(
+    R.toPairs,
+    R.map(([key, value]) => getTransform(key)(value, key, dirs)),
+    R.flatten
+  )
+}
 
 // options may contain any docker run options
-const makeRunArgs = (service, options = {}) => R.pipe(
-  moveProps(dorcArgs, R.lensProp('service'), R.lensProp('dorc')), // move non-docker-run keys
-  mergeProps(['service', 'options'], R.lensProp('options')), // the rest are docker run args
-  R.over(R.lensProp('options'), transformDockerOptions),
-  R.converge(
-    (cmd, options) => {
-      return cmd ? R.append(cmd)(options) : options
-    }, [
-      R.path(['dorc', 'cmd']),
-      R.prop('options')
-    ]
-  )
-)({service, options})
+const makeRunArgs = (
+  service,
+  options = {},
+  dirs = {
+    cwd: process.cwd(),
+    homedir: getHomedir()
+  }
+) => {
+  if (!service.image) {
+    throw new Error('service image is required')
+  }
+  return R.pipe(
+    // move props that aren't for docker run
+    moveProps(dorcArgs, R.lensProp('service'), R.lensProp('dorc')),
+    mergeProps(['service', 'options'], R.lensProp('options')), // the rest are docker run args
+    R.over(R.lensProp('options'), transformDockerOptions(dirs)),
+    R.converge(
+      (dorc, options) => {
+        return R.pipe(
+          R.pick(['image', 'cmd']),
+          R.values,
+          R.concat(options)
+        )(dorc)
+      }, [
+        R.prop('dorc'),
+        R.prop('options')
+      ]
+    )
+  )({service, options})
+}
 /*  R.pipe(
     R.map(([key, value]) => getTransform(key)(value, key)),
     R.flatten

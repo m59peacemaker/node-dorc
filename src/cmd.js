@@ -16,7 +16,7 @@ process.on('unhandledRejection', (reason) => {
 })
 
 const cmds = [
-  //'build',
+  'build',
   'run'
   //'up',
   //'down',
@@ -49,7 +49,7 @@ const assertCmdValid = (cmd) => {
   }
 }
 
-const args = yargs.usage('\nUsage: $0 [options] <command> [services...]')
+const args = yargs.usage('\nUsage: $0 [options] <command> [command-args...]')
   .option('m', {
     alias: 'mode',
     describe: 'use given mode specific config',
@@ -63,13 +63,21 @@ const args = yargs.usage('\nUsage: $0 [options] <command> [services...]')
     global: true
   })
   .command({
-    command: 'build',
+    command: 'build [services...]',
     desc: 'build image(s)',
     handler: (args) => handler('build', args)
   })
   .command({
-    command: 'up',
-    desc: 'start service(s)',
+    command: 'run <service> [cmd...]',
+    desc: 'run service',
+    handler: args => {
+      args.cmd = args.cmd.join(' ')
+      return handler('run', args)
+    }
+  })
+  .command({
+    command: 'up [services...]',
+    desc: 'build and start service(s)',
     handler: (args) => handler('up', args),
     builder: (y) => {
       return y
