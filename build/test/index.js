@@ -1,0 +1,32 @@
+const test = require('tape');
+const outputFile = require('output-file-sync');
+
+var _require = require('path');
+
+const joinPath = _require.join;
+
+var _require2 = require('rimraf');
+
+const rmdir = _require2.sync;
+
+
+const cmd = require.resolve('../cmd.js');
+
+const tmpDir = '/tmp/dorc';
+
+const setup = config => {
+  outputFile(joinPath(tmpDir, '/dorc.yaml'), config);
+};
+
+const cleanup = () => {
+  rmdir(tmpDir);
+};
+
+module.exports = {
+  test,
+  cmd,
+  tmpDir,
+  setup,
+  cleanup
+};
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi4uLy4uL3NyYy90ZXN0L2luZGV4LmpzIl0sIm5hbWVzIjpbInRlc3QiLCJyZXF1aXJlIiwib3V0cHV0RmlsZSIsImpvaW5QYXRoIiwiam9pbiIsInJtZGlyIiwic3luYyIsImNtZCIsInJlc29sdmUiLCJ0bXBEaXIiLCJzZXR1cCIsImNvbmZpZyIsImNsZWFudXAiLCJtb2R1bGUiLCJleHBvcnRzIl0sIm1hcHBpbmdzIjoiQUFBQSxNQUFNQSxPQUFPQyxRQUFRLE1BQVIsQ0FBYjtBQUNBLE1BQU1DLGFBQWFELFFBQVEsa0JBQVIsQ0FBbkI7O2VBQ3lCQSxRQUFRLE1BQVIsQzs7TUFBWkUsUSxZQUFOQyxJOztnQkFDZUgsUUFBUSxRQUFSLEM7O01BQVRJLEssYUFBTkMsSTs7O0FBRVAsTUFBTUMsTUFBTU4sUUFBUU8sT0FBUixDQUFnQixXQUFoQixDQUFaOztBQUVBLE1BQU1DLFNBQVMsV0FBZjs7QUFFQSxNQUFNQyxRQUFRQyxVQUFVO0FBQ3RCVCxhQUFXQyxTQUFTTSxNQUFULEVBQWlCLFlBQWpCLENBQVgsRUFBMkNFLE1BQTNDO0FBQ0QsQ0FGRDs7QUFJQSxNQUFNQyxVQUFVLE1BQU07QUFDcEJQLFFBQU1JLE1BQU47QUFDRCxDQUZEOztBQUlBSSxPQUFPQyxPQUFQLEdBQWlCO0FBQ2ZkLE1BRGU7QUFFZk8sS0FGZTtBQUdmRSxRQUhlO0FBSWZDLE9BSmU7QUFLZkU7QUFMZSxDQUFqQiIsImZpbGUiOiJpbmRleC5qcyIsInNvdXJjZXNDb250ZW50IjpbImNvbnN0IHRlc3QgPSByZXF1aXJlKCd0YXBlJylcbmNvbnN0IG91dHB1dEZpbGUgPSByZXF1aXJlKCdvdXRwdXQtZmlsZS1zeW5jJylcbmNvbnN0IHtqb2luOiBqb2luUGF0aH0gPSByZXF1aXJlKCdwYXRoJylcbmNvbnN0IHtzeW5jOiBybWRpcn0gPSByZXF1aXJlKCdyaW1yYWYnKVxuXG5jb25zdCBjbWQgPSByZXF1aXJlLnJlc29sdmUoJ34vY21kLmpzJylcblxuY29uc3QgdG1wRGlyID0gJy90bXAvZG9yYydcblxuY29uc3Qgc2V0dXAgPSBjb25maWcgPT4ge1xuICBvdXRwdXRGaWxlKGpvaW5QYXRoKHRtcERpciwgJy9kb3JjLnlhbWwnKSwgY29uZmlnKVxufVxuXG5jb25zdCBjbGVhbnVwID0gKCkgPT4ge1xuICBybWRpcih0bXBEaXIpXG59XG5cbm1vZHVsZS5leHBvcnRzID0ge1xuICB0ZXN0LFxuICBjbWQsXG4gIHRtcERpcixcbiAgc2V0dXAsXG4gIGNsZWFudXBcbn1cbiJdfQ==

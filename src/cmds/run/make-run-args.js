@@ -7,6 +7,7 @@ const R = require('ramda')
 const expandTilde = require('expand-tilde')
 const moveProps = require('~/lib/move-props')
 const mergeProps = require('~/lib/merge-props')
+const transformDockerOptions = require('~/lib/transform-docker-options')
 
 const dorcArgs = [
   'mode',
@@ -30,29 +31,6 @@ const propTransforms = {
   ports: value => value.map(v => ['-p', v])
 }
 
-const getTransform = prop => {
-  const transform = propTransforms[prop]
-  if (!transform) {
-    return (value, prop) => {
-      if (Array.isArray(value)) {
-        return value.map(v => ['--' + prop, v])
-      } else {
-        return ['--' + prop, value]
-      }
-    }
-  } else {
-    return transform
-  }
-}
-
-const transformDockerOptions = dirs => {
-  return R.pipe(
-    R.toPairs,
-    R.map(([key, value]) => getTransform(key)(value, key, dirs)),
-    R.flatten
-  )
-}
-
 // options may contain any docker run options
 const makeRunArgs = (
   service,
@@ -69,7 +47,7 @@ const makeRunArgs = (
     // move props that aren't for docker run
     moveProps(dorcArgs, R.lensProp('service'), R.lensProp('dorc')),
     mergeProps(['service', 'options'], R.lensProp('options')), // the rest are docker run args
-    R.over(R.lensProp('options'), transformDockerOptions(dirs)),
+    R.over(R.lensProp('options'), transformDockerOptions(propTransforms, dirs)),
     R.converge(
       (dorc, options) => {
         return R.pipe(

@@ -1,20 +1,36 @@
-const {exec} = require('child_process')
+const {exec, execSync} = require('child_process')
 const {
   test,
   cmd,
   tmpDir,
-  setup,
+  setup: _setup,
   cleanup
 } = require('~/test')
+const outputFile = require('output-file-sync')
+const {join: joinPath} = require('path')
+const run = require('~/cmds/run')
+const build = require('./')
+
+const setup = (config, Dockerfile) => {
+  _setup(config)
+  outputFile(joinPath(tmpDir, '/Dockerfile'), Dockerfile)
+}
 
 test('', t => {
   t.plan(1)
+  return t.fail()
   const config = `
     services:
       hello:
-        image: pmkr/hello:1.0
+        image:
+          file: ./Dockerfile
+          tags: dorc-build-test
   `
-  setup(config)
+  const Dockerfile = `
+    FROM pmkr/hello:1.0
+    CMD ["Dolly"]
+  `
+  /*setup(config, Dockerfile)
   exec(`${cmd} build hello`, {cwd: tmpDir}, (err, stdout, stderr) => {
     if (err) {
       return t.fail(err)
@@ -31,5 +47,5 @@ test('', t => {
       t.fail('Wrong output')
     }
     cleanup()
-  })
+  })*/
 })
