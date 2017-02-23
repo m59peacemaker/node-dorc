@@ -6,7 +6,7 @@ test('no config results in basic build args', t => {
   t.plan(1)
   t.equal(
     makeArgs().join(' '),
-    'build ./'
+    './'
   )
 })
 
@@ -17,7 +17,7 @@ test('file and tags', t => {
       file: './Dockerfile',
       tags: ['foo']
     }).join(' '),
-    'build --file ./Dockerfile --tag foo ./'
+    '--file ./Dockerfile --tag foo ./'
   )
 })
 
@@ -27,7 +27,7 @@ test('context', t => {
     makeArgs({
       context: './foo'
     }).join(' '),
-    'build ./foo'
+    './foo'
   )
 })
 
@@ -37,7 +37,7 @@ test('context expands ~', t => {
     makeArgs({
       context: '~/foo'
     }).join(' '),
-    `build ${os.homedir()}/foo`
+    `${os.homedir()}/foo`
   )
 })
 
@@ -47,6 +47,6 @@ test('file expands ~', t => {
     makeArgs({
       file: '~/DAT-FILE'
     }).join(' '),
-    `build --file ${os.homedir()}/DAT-FILE ./`
+    `--file ${os.homedir()}/DAT-FILE ./`
   )
 })

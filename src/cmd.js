@@ -15,7 +15,7 @@ process.on('unhandledRejection', (reason) => {
   throw reason
 })
 
-const cmds = [
+const handlers = [
   'build',
   'run'
   //'up',
@@ -23,9 +23,9 @@ const cmds = [
   //'follow',
   //'sh',
   //'task'
-].reduce((cmds, cmd) => {
-  cmds[cmd] = require('./cmds/' + cmd)
-  return cmds
+].reduce((handlers, cmd) => {
+  handlers[cmd] = require('./handler/' + cmd)
+  return handlers
 }, {})
 
 const handler = async (name, args = {}) => {
@@ -36,7 +36,7 @@ const handler = async (name, args = {}) => {
   args.services = args._.slice(1)
   const config = await getConfig(process.cwd(), args.mode)
   const selectedServices = filterSelectedServices(config.prepared.services, args.services)
-  const handler = cmds[name]
+  const handler = handlers[name]
   return handler(selectedServices, config, args)
 }
 
@@ -44,11 +44,14 @@ const assertCmdValid = (cmd) => {
   if (cmd === undefined) {
     throw new Error('no command given')
   }
-  if (!cmds.hasOwnProperty(cmd)) {
+  if (!handlers.hasOwnProperty(cmd)) {
     throw new Error(`"${cmd}" is not a valid command`)
   }
 }
-
+const dryOption = ['dry', {
+  describe: 'print only dry run',
+  type: 'boolean'
+}]
 const args = yargs.usage('\nUsage: $0 [options] <command> [command-args...]')
   .option('m', {
     alias: 'mode',
@@ -65,7 +68,11 @@ const args = yargs.usage('\nUsage: $0 [options] <command> [command-args...]')
   .command({
     command: 'build [services...]',
     desc: 'build image(s)',
-    handler: (args) => handler('build', args)
+    handler: (args) => handler('build', args),
+    builder: (y) => {
+      return y
+        .option(...dryOption)
+    }
   })
   .command({
     command: 'run <service> [cmd...]',
@@ -73,6 +80,10 @@ const args = yargs.usage('\nUsage: $0 [options] <command> [command-args...]')
     handler: args => {
       args.cmd = args.cmd.join(' ')
       return handler('run', args)
+    },
+    builder: (y) => {
+      return y
+        .option(...dryOption)
     }
   })
   .command({
@@ -81,17 +92,22 @@ const args = yargs.usage('\nUsage: $0 [options] <command> [command-args...]')
     handler: (args) => handler('up', args),
     builder: (y) => {
       return y
-      .option('d', {
-        alias: 'detached',
-        describe: 'start services in background',
-        type: 'boolean'
-      })
+        .option('d', {
+          alias: 'detached',
+          describe: 'start services in background',
+          type: 'boolean'
+        })
+        .option(...dryOption)
     }
   })
   .command({
     command: 'down',
     desc: 'stop service(s) and remove container(s)',
-    handler: (args) => handler('down', args)
+    handler: (args) => handler('down', args),
+    builder: (y) => {
+      return y
+        .option(...dryOption)
+    }
   })
   .command({
     command: 'logs',

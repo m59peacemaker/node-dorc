@@ -32,7 +32,7 @@ const makeBuildArgs = (
   }
   const buildArgs = transform(R.omit(['context'], config))
   const context = expandTilde(config.context || './')
-  return ['build', ...buildArgs, context]
+  return [...buildArgs, context]
 }
 
 module.exports = makeBuildArgs

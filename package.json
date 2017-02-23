@@ -5,8 +5,8 @@
     "dorc": "build/cmd.js"
   },
   "scripts": {
-    "build": "babel ./src --out-dir ./build --source-maps inline",
-    "test": "tape ./build/**/*.test.js",
+    "build": "rm -r ./build; babel ./src --out-dir ./build --source-maps inline",
+    "test": "tape './build/**/*.test.js'",
     "build-test": "npm run build && npm run test",
     "watch": "onchange -i src -- npm run build-test --silent"
   },
