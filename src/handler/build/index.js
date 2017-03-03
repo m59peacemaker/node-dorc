@@ -85,7 +85,7 @@ const Work = R.curry((effects, display) => {
   }
 })
 
-const build = (selectedServices, config, args) => {
+const build = (selectedServices, config, args, global) => {
   const toBuild = prepareServices(selectedServices)
   validateImages(toBuild)
   const effects = args.dry ? dryEffects : wetEffects

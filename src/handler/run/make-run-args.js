@@ -31,10 +31,19 @@ const propTransforms = {
   ports: value => value.map(v => ['-p', v])
 }
 
+const renameKeys = R.curry((keysMap, obj) =>
+  R.reduce((acc, key) => R.assoc(keysMap[key] || key, obj[key], acc), {}, R.keys(obj))
+)
+
+const propOrPath = R.ifElse(R.isArrayLike, R.path, R.prop)
+const propsOrPaths = items => R.juxt(R.map(propOrPath, items))
+const concatAll = R.reduce(R.concat, [])
+const removeNil = R.filter(R.complement(R.isNil))
+
 // options may contain any docker run options
 const makeRunArgs = (
   service,
-  options = {},
+  args = {}, // {options: [...parsedOptions], service: '', cmd: [...commandParts]}
   dirs = {
     cwd: process.cwd(),
     homedir: getHomedir()
@@ -44,23 +53,34 @@ const makeRunArgs = (
     throw new Error('service image is required')
   }
   return R.pipe(
-    // move props that aren't for docker run
+    // move props that aren't for docker run from "service" to "dorc"
     moveProps(dorcArgs, R.lensProp('service'), R.lensProp('dorc')),
-    mergeProps(['service', 'options'], R.lensProp('options')), // the rest are docker run args
+    // the rest are docker run options
+    // mergeProps(['service', 'options'], R.lensProp('options')),
+    renameKeys({service: 'options'}),
     R.over(R.lensProp('options'), transformDockerOptions(propTransforms, dirs)),
+    R.tap(console.log),
+    R.converge(
+      R.set(R.lensProp('options')),
+      [
+        R.pipe(propsOrPaths(['options', ['args', 'options']]), removeNil, concatAll),
+        R.identity
+      ]
+    ),
     R.converge(
       (dorc, options) => {
         return R.pipe(
           R.pick(['image', 'cmd']),
           R.values,
-          R.concat(options)
+          R.concat(options),
+          R.flatten
         )(dorc)
       }, [
         R.prop('dorc'),
         R.prop('options')
       ]
     )
-  )({service, options})
+  )({service, args})
 }
 /*  R.pipe(
     R.map(([key, value]) => getTransform(key)(value, key)),

@@ -81,3 +81,17 @@ test('various', t => {
     `--net host -e FOO="foo foo" -v ${os.homedir()}/foo:/foo ${image} foo bar`
   )
 })
+
+test('basic options from service and cli args', t => {
+  t.plan(1)
+  const service = {
+    image,
+    env: {
+      FOO: 'foo foo'
+    }
+  }
+  t.equal(
+    makeArgs(service, {options: ['-e', 'BAR="bar bar"']}).join(' '),
+    `-e FOO="foo foo" -e BAR="bar bar" ${image}`
+  )
+})

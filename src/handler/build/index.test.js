@@ -1,13 +1,12 @@
-const {exec, execSync} = require('child_process')
-const pify = require('pify')
-const execAsync = pify(exec, {multiArgs: true})
 const {
   test,
   cmd,
   tmpDir,
   setup,
-  cleanup
+  cleanup,
+  execAsync
 } = require('~/test')
+const {execSync} = require('child_process')
 const outputFile = require('output-file-sync')
 const {join: joinPath} = require('path')
 const run = require('~/handler/run')
