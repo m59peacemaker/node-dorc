@@ -2,9 +2,10 @@ const test = require('tape')
 const outputFile = require('output-file-sync')
 const {join: joinPath} = require('path')
 const {sync: rmdir} = require('rimraf')
-const {exec, execSync} = require('child_process')
+const {exec, execSync, execFile} = require('child_process')
 const pify = require('pify')
 const execAsync = pify(exec, {multiArgs: true})
+const execFileAsync = pify(execFile, {multiArgs: true})
 
 const cmd = require.resolve('~/cmd.js')
 
@@ -24,5 +25,6 @@ module.exports = {
   tmpDir,
   setup,
   cleanup,
-  execAsync
+  execAsync,
+  execFileAsync
 }

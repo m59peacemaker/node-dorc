@@ -11,99 +11,26 @@ const filterSelectedServices = require('./lib/filter-selected-services')
 const tryCatch = require('try_catch')
 const pad = require('~/lib/pad')
 const Help = require('~/lib/help')
-const minimist = require('minimist')
 const R = require('ramda')
 const wrapInQuotes = v => `"${v}"`
 const quoteSpaced = v => v.includes(' ') ? wrapInQuotes(v) : v
 const zipObjRest = R.curry(require('~/lib/zip-obj-rest'))
-const parseArgs = (options = {}, args = [], opts = {}) => {
-  const _ = Object.keys(options).reduce((_, k) => {
-    const v = options[k]
-    ;['string', 'boolean'].forEach(type => {
-      if (v.type === type) {
-        _[type].push(k)
-      }
-    })
-    if (v.alias) {
-      _.alias[k] = v.alias
-    }
-    return _
-  }, {string: [], boolean: [], alias: {}})
-  return minimist(args, {...opts, ..._})
-}
-const parse = (options, args) => parseArgs(options, args, {stopEarly: true})
-
-// convenience for minimist, {parsed, remaining} instead of parsed._ (underscore)
-const separateRemaining = args => ({parsed: R.omit('_')(args), remaining: R.prop('_')(args)})
+const parseArgs = require('~/lib/parse-args')
+const commands = require('./commands')
+const options = require('./options')
 
 process.on('unhandledRejection', (reason) => {
   console.error('unhandled rejection:'.toUpperCase())
   throw reason
 })
 
-const handlers = [
-  'build',
-  'run',
-  //'up',
-  //'down',
-  'follow',
-  //'sh',
-  //'task'
-].reduce((handlers, cmd) => {
-  handlers[cmd] = require('./handler/' + cmd)
-  return handlers
-}, {})
-
-
-const options = {
-  mode: {
-    type: 'string',
-    description: 'use given mode specific config',
-    alias: ['m']
-  },
-  help: {
-    type: 'boolean',
-    description: 'show help menu',
-    alias: ['h']
-  }
-}
-
-const dryOption = {
-  dry: {
-    type: 'boolean',
-    description: 'print only dry run'
-  }
-}
-
-const commands = {
-  build: {
-    usage: 'build [options...] [services...]',
-    description: 'build images(s)',
-    options: {
-      ...dryOption
-    },
-    parse: (remaining, options) => R.over(
-      R.lensProp('sub'),
-      R.assoc('services', remaining)
-    )(options)
-  },
-  run: require('~/handler/run/command')
-}
 const showHelp = () => console.log(pad.vertical(
   1,
   Help('dorc [dorc-options...] <command> [command-options...]', options, commands)
 ))
 
-const {_: subArgs, ...global} = parse(options, process.argv.slice(2))
-const subInfo = zipObjRest(['command', 'args'], subArgs)
-const subCommand = commands[subInfo.command] // validate
-// TODO: ensure all given args are known
-const {_: remaining, ...sub} = parse(subCommand.options, subInfo.args)
-
-const args = subCommand.parse ? subCommand.parse(remaining, {sub, global}) : {global, sub}
-
 const handler = async (name, args = {}) => {
-  if (args.help === true) { // TODO: sub command help
+  if (args.global.help === true) { // TODO: sub command help
     showHelp()
     process.exit(0)
   }
@@ -112,11 +39,12 @@ const handler = async (name, args = {}) => {
     config.prepared.services,
     args.sub.services || [args.sub.service]
   )
-  const handler = handlers[name]
-  return handler(selectedServices, config, args.sub, args.global)
+  const handler = commands[name].handler
+  return handler(selectedServices, config, args.sub)
 }
 
-handler(subInfo.command, args)
+const args = parseArgs(options, commands, process.argv.slice(2))
+handler(args.command, args)
 
 /* const assertCmdValid = (cmd) => { */
 /*   if (cmd === undefined) { */

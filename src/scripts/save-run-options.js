@@ -5,6 +5,6 @@ const path = require('path')
 const getRunOptions = require('~/lib/get-docker-run-options')
 
 fs.writeFileSync(
-  path.join(__dirname, '../../src/handle/run/docker-run-options.json'),
+  path.join(__dirname, '../../src/handler/run/docker-run-options.json'),
   JSON.stringify(getRunOptions(), null, 2)
 )

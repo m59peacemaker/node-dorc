@@ -8,6 +8,9 @@ const expandTilde = require('expand-tilde')
 const moveProps = require('~/lib/move-props')
 const mergeProps = require('~/lib/merge-props')
 const transformDockerOptions = require('~/lib/transform-docker-options')
+const dockerOptionsToArray = require('./docker-options-to-array')
+
+const ensureArray = v => Array.isArray(v) ? v : [v]
 
 const dorcArgs = [
   'mode',
@@ -27,7 +30,7 @@ const propTransforms = {
       }
     })
   },
-  env: value => R.toPairs(value).map(([k, v]) => ['-e', `${k}="${v}"`]),
+  env: value => R.toPairs(value).map(([k, v]) => ['-e', `${k}=${v}`]),
   ports: value => value.map(v => ['-p', v])
 }
 
@@ -40,10 +43,11 @@ const propsOrPaths = items => R.juxt(R.map(propOrPath, items))
 const concatAll = R.reduce(R.concat, [])
 const removeNil = R.filter(R.complement(R.isNil))
 
-// options may contain any docker run options
+const findCmd = (a, b) => (b.cmd && b.cmd.length) ? b.cmd : (a.cmd || [])
+
 const makeRunArgs = (
-  service,
-  args = {}, // {options: [...parsedOptions], service: '', cmd: [...commandParts]}
+  service, // similiar to `args.docker` but with additional properties like `image`
+  args = {}, // {docker: {env: 'FOO=foo', net: 'host'} cmd: [...commandParts]}
   dirs = {
     cwd: process.cwd(),
     homedir: getHomedir()
@@ -59,25 +63,20 @@ const makeRunArgs = (
     // mergeProps(['service', 'options'], R.lensProp('options')),
     renameKeys({service: 'options'}),
     R.over(R.lensProp('options'), transformDockerOptions(propTransforms, dirs)),
-    R.tap(console.log),
+    R.over(R.lensPath(['args', 'docker']), dockerOptionsToArray),
     R.converge(
       R.set(R.lensProp('options')),
       [
-        R.pipe(propsOrPaths(['options', ['args', 'options']]), removeNil, concatAll),
+        R.pipe(propsOrPaths(['options', ['args', 'docker']]), concatAll),
         R.identity
       ]
     ),
     R.converge(
-      (dorc, options) => {
-        return R.pipe(
-          R.pick(['image', 'cmd']),
-          R.values,
-          R.concat(options),
-          R.flatten
-        )(dorc)
-      }, [
-        R.prop('dorc'),
-        R.prop('options')
+      R.unapply(R.reduce(R.concat, [])),
+      [
+        R.prop('options'),
+        R.pipe(R.path(['dorc', 'image']), ensureArray),
+        R.converge(findCmd, [R.prop('dorc'), R.prop('args')]),
       ]
     )
   )({service, args})

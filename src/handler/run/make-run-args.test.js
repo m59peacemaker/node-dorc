@@ -3,7 +3,9 @@ const test = require('tape')
 const makeArgs = require('./make-run-args')
 const image = 'pmkr/hello:1.0'
 
-test('throws if no image given', t => {
+// makeRunArgs(serviceConfigObject, {service: '', cmd: [], options: {}, docker: {}})
+
+test('throws if no service.image', t => {
   t.plan(1)
   try {
     makeArgs({})
@@ -30,9 +32,9 @@ test('service.env', t => {
       BAR: 'bar bar'
     }
   }
-  t.equal(
-    makeArgs(service).join(' '),
-    `-e FOO="foo" -e BAR="bar bar" ${image}`
+  t.deepEqual(
+    makeArgs(service),
+    ['-e', 'FOO=foo', '-e', 'BAR=bar bar', image]
   )
 })
 
@@ -45,7 +47,7 @@ test('service.volumes', t => {
       '~/tmp:/tmp'
     ]
   }
-  t.equal(
+  t.deepEqual(
     makeArgs(service).join(' '),
     `-v ${process.cwd()}/foo:/app -v ${os.homedir()}/tmp:/tmp ${image}`
   )
@@ -55,11 +57,23 @@ test('service.cmd', t => {
   t.plan(1)
   const service = {
     image,
-    cmd: 'foo bar baz'
+    cmd: ['foo', 'bar', 'baz']
   }
-  t.equal(
-    makeArgs(service).join(' '),
-    `${image} foo bar baz`
+  t.deepEqual(
+    makeArgs(service),
+    [image, 'foo', 'bar', 'baz']
+  )
+})
+
+test('service.cmd with quotes', t => {
+  t.plan(1)
+  const service = {
+    image,
+    cmd: ['/bin/sh', '-c', 'printf "fail"']
+  }
+  t.deepEqual(
+    makeArgs(service),
+    [image, '/bin/sh', '-c', 'printf "fail"']
   )
 })
 
@@ -67,7 +81,7 @@ test('various', t => {
   t.plan(1)
   const service = {
     image,
-    cmd: 'foo bar',
+    cmd: ['foo', 'bar'],
     net: 'host',
     env: {
       FOO: 'foo foo'
@@ -76,9 +90,9 @@ test('various', t => {
       '~/foo:/foo',
     ]
   }
-  t.equal(
-    makeArgs(service).join(' '),
-    `--net host -e FOO="foo foo" -v ${os.homedir()}/foo:/foo ${image} foo bar`
+  t.deepEqual(
+    makeArgs(service),
+    ['--net', 'host', '-e', 'FOO=foo foo', '-v', `${os.homedir()}/foo:/foo`, image, 'foo', 'bar']
   )
 })
 
@@ -90,8 +104,8 @@ test('basic options from service and cli args', t => {
       FOO: 'foo foo'
     }
   }
-  t.equal(
-    makeArgs(service, {options: ['-e', 'BAR="bar bar"']}).join(' '),
-    `-e FOO="foo foo" -e BAR="bar bar" ${image}`
+  t.deepEqual(
+    makeArgs(service, {docker: {env: 'FOO=bar bar'}}),
+    ['-e', 'FOO=foo foo', '--env', 'FOO=bar bar', image]
   )
 })

@@ -7,6 +7,9 @@ const makeBuildArgs = require('./make-build-args')
 const promisifyProcess = require('~/lib/promisify-process')
 const Display = require('~/lib/display')
 const format = require('chalk')
+const sharedOptions = require('~/lib/shared-options')
+const minimist = require('minimist')
+const prepOptionsForMinimist = require('~/lib/prep-options-for-minimist')
 
 const RemoveDangling = remover => {
   return images => Promise.all(
@@ -85,11 +88,23 @@ const Work = R.curry((effects, display) => {
   }
 })
 
-const build = (selectedServices, config, args, global) => {
+const handler = (selectedServices, config, {services, args}) => {
   const toBuild = prepareServices(selectedServices)
   validateImages(toBuild)
   const effects = args.dry ? dryEffects : wetEffects
   return BuildImages(Work(effects))(toBuild)
 }
 
-module.exports = build
+module.exports = {
+  usage: 'build [options...] [services...]',
+  description: 'build images(s)',
+  options: {
+    dry: sharedOptions.dry
+  },
+  parse: (args, options) => {
+    const minimistOpts = prepOptionsForMinimist(options)
+    const {_: services, ...opts} = minimist(args, minimistOpts)
+    return {services, args: opts}
+  },
+  handler
+}

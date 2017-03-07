@@ -31,7 +31,7 @@ test('build command builds images for given service', t => {
   setup(config)
   outputFile(joinPath(tmpDir, '/Dockerfile'), Dockerfile)
   execAsync(`${cmd} build hello --colors`, {cwd: tmpDir})
-    .then(([stdout, stderr]) => console.log(stdout))
+    .then(([stdout, stderr]) => console.log(stdout, stderr))
     .then(() => Promise.all(
       [1, 2].map(idx => execAsync(`docker run --rm dorc-build-test${idx}`)
         .then(([stdout, stderr]) => {

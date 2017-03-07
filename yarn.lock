@@ -197,11 +197,11 @@ babel-messages@^6.8.0:
   dependencies:
     babel-runtime "^6.0.0"
 
-babel-plugin-root-require@^1.1.1:
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/babel-plugin-root-require/-/babel-plugin-root-require-1.1.1.tgz#887c14db4145e62443d5680af2ced869c3905c6d"
+babel-plugin-root-require@^1.3.0:
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/babel-plugin-root-require/-/babel-plugin-root-require-1.3.0.tgz#0387a01b348c5426666e1837218414be1887405d"
   dependencies:
-    root-import-utils "^1.0.4"
+    root-import-utils "^1.1.0"
 
 babel-plugin-syntax-async-functions@^6.8.0:
   version "6.13.0"
@@ -679,6 +679,16 @@ find-up@^1.0.0:
   dependencies:
     path-exists "^2.0.0"
     pinkie-promise "^2.0.0"
+
+fj-compose@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/fj-compose/-/fj-compose-1.1.0.tgz#5db342b573c67d72bcf08b86164744fc22c93379"
+
+fj-pipe@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/fj-pipe/-/fj-pipe-1.1.0.tgz#4315098c050f64e3980aea7a6e7a058ea1c47038"
+  dependencies:
+    fj-compose "^1.1.0"
 
 for-each@~0.3.2:
   version "0.3.2"
@@ -1421,6 +1431,10 @@ parse-passwd@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/parse-passwd/-/parse-passwd-1.0.0.tgz#6d5b934a456993b23d37f40a382d6f1666a8e5c6"
 
+parse-spawn-args@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/parse-spawn-args/-/parse-spawn-args-1.0.2.tgz#a89bb748c196298d5d617fd94b0d0a436fc86ae7"
+
 path-exists@^2.0.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/path-exists/-/path-exists-2.1.0.tgz#0feb6c64f0fc518d9a754dd5efb62c7022761f4b"
@@ -1698,10 +1712,11 @@ rimraf@~2.5.1, rimraf@~2.5.4:
   dependencies:
     glob "^7.0.5"
 
-root-import-utils@^1.0.4:
-  version "1.0.5"
-  resolved "https://registry.yarnpkg.com/root-import-utils/-/root-import-utils-1.0.5.tgz#51e2a1a905825e2eab6d65254c017e1cf24e406f"
+root-import-utils@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/root-import-utils/-/root-import-utils-1.1.0.tgz#b6fc699244f499af0fb8541fab669888692f1fea"
   dependencies:
+    fj-pipe "^1.1.0"
     path "^0.12.7"
     regexp.escape "^1.0.2"
 
