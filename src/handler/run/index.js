@@ -1,4 +1,5 @@
 const {spawn} = require('child_process')
+const {isatty} = require('tty')
 const makeRunArgs = require('./make-run-args')
 const minimist = require('minimist')
 const sharedOptions = require('~/lib/shared-options')
@@ -9,6 +10,19 @@ const prepOptionsForMinimist = require('~/lib/prep-options-for-minimist')
 const singleServiceCommand = require('~/lib/single-service-command')
 const mapKeys = require('~/lib/map-keys')
 
+const stringToArray = R.when(R.is(String), R.of)
+const concatRight = R.flip(R.concat)
+const addArgs = R.mergeWithKey(R.pipe(
+  // this is called when the destination object already has a key
+  R.unapply(R.slice(1, 3)), // (k, l, r) => [l, r]
+  R.ifElse(
+    R.pipe(R.nth(0), R.is(Boolean)),
+    R.nth(0), // return "l" if it is a boolean
+    // turn "l" and "r" strings into arrays and then add "l" to the end of "r"
+    R.pipe(R.map(stringToArray), R.apply(concatRight))
+  )
+))
+
 const defaultArgs = {cmd: [], options: {}, docker: {}}
 /* args.docker keys are --names (not aliases)
  * false values will be ignored
@@ -16,13 +30,18 @@ const defaultArgs = {cmd: [], options: {}, docker: {}}
  * {env: 'FOO=foo'} {env: ['FOO=foo', 'BAR=bar']}
  */
 const handler = singleServiceCommand((service, config, args = defaultArgs) => {
-  // TODO: figure out detach, rm, name
-  /*const name = `${config.project.name}_${args.service}`
-  args.docker.name = name
-  args.docker.rm = true*/
+  // TODO: runArgs need formatting for string usage (double quote values with spaces)
+   args.docker = R.pipe(
+    R.when(_ => isatty(1), addArgs({interactive: true, tty: true})),
+    R.unless(R.compose(R.equals(true), R.prop('detach')), R.assoc('rm', true))
+  )(args.docker)
   const runArgs = ['run', ...makeRunArgs(service, args)]
   console.log(`docker ${runArgs.join(' ')}`)
-  spawn('docker', runArgs, {stdio: 'inherit'})
+  return new Promise((resolve, reject) => {
+    const p = spawn('docker', runArgs, {stdio: 'inherit'})
+    // TODO: make/use a module for promisfying a process, this does not handle all cases
+    p.on('close', code => code !== 0 ? reject(code) : resolve())
+  })
 })
 
 const dockerRunOptions = require('./docker-run-options')

@@ -51,12 +51,12 @@ const BuildImages = Work => {
   )
 }
 
+// TODO: just use Joi schema for validation
 const validateImage = image => {
   if (!(image.file && image.file.length)) {
     throw new Error(`no Dockerfile path given for "${name}" service image`)
   }
 }
-
 const validateImages = toBuild => R.pipe(R.values, R.flatten, R.map(validateImage))
 
 const wetEffects = {
@@ -88,7 +88,8 @@ const Work = R.curry((effects, display) => {
   }
 })
 
-const handler = (selectedServices, config, {services, args}) => {
+const defaultOptions = {services: [], args: {}}
+const handler = (selectedServices, config, {services, args} = defaultOptions) => {
   const toBuild = prepareServices(selectedServices)
   validateImages(toBuild)
   const effects = args.dry ? dryEffects : wetEffects
