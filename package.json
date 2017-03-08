@@ -22,6 +22,7 @@
     "futurize-p": "^1.0.0",
     "interpol8": "^1.0.1",
     "interpolate-shell": "^1.1.0",
+    "joi": "^10.2.2",
     "js-yaml": "^3.6.1",
     "minimist": "^1.2.0",
     "mock-spawn": "^0.2.6",

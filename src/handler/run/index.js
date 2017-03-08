@@ -7,19 +7,23 @@ const R = require('ramda')
 const zipObjRest = R.curry(require('~/lib/zip-obj-rest'))
 const prepOptionsForMinimist = require('~/lib/prep-options-for-minimist')
 const singleServiceCommand = require('~/lib/single-service-command')
+const mapKeys = require('~/lib/map-keys')
 
-// args = {cmd: [], options: {}, docker: {}}
-const handler = singleServiceCommand((service, config, args) => {
-  // const name = `${config.project.name}_${args.service}`
-  // service = args.cmd ? {...service, cmd: args.cmd} : service
-  // service = options.containerName ? {...service, name: options.containerName} : service
+const defaultArgs = {cmd: [], options: {}, docker: {}}
+/* args.docker keys are --names (not aliases)
+ * false values will be ignored
+ * values that can be declared multiple times can be strings or arrays
+ * {env: 'FOO=foo'} {env: ['FOO=foo', 'BAR=bar']}
+ */
+const handler = singleServiceCommand((service, config, args = defaultArgs) => {
+  // TODO: figure out detach, rm, name
+  /*const name = `${config.project.name}_${args.service}`
+  args.docker.name = name
+  args.docker.rm = true*/
   const runArgs = ['run', ...makeRunArgs(service, args)]
   console.log(`docker ${runArgs.join(' ')}`)
   spawn('docker', runArgs, {stdio: 'inherit'})
 })
-
-const mapKeys = require('~/lib/map-keys')
-const parse = require('~/../../micromist')
 
 const dockerRunOptions = require('./docker-run-options')
 const keysMatching = R.curry((pattern, obj) => R.pipe(

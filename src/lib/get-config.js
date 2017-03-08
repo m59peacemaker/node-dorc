@@ -9,6 +9,7 @@ const normalizeConfig = require('./normalize-config')
 const {Future} = require('ramda-fantasy')
 const promisifyF = require('promisify-f')
 const futurizeP = require('futurize-p')(Future)
+const configSchema = require('~/schema/config')
 
 const getDefaults = (projectPath) => ({
   projectName: path.basename(projectPath)
@@ -45,6 +46,7 @@ const getConfig = async (projectPath, mode) => {
   const locals = await getLocals(preInterpolateConfig.locals)
   const interpolated = await interpolateConfig(raw, locals)
   const parsed = Object.assign({}, getDefaults(projectPath), parseYAML(interpolated))
+  configSchema.loose.validate(parsed)
   // merge config objects with mode specific objects,
   //   so that we have only the config for the given mode
   const modeConfig = getModeConfig(mode || parsed.defaultMode, parsed)

@@ -88,19 +88,6 @@ const startServices = (services, config, args) => Promise.all(R.pipe(
   })
 )(services))
 
-const prepare = R.over(
-  R.lensProp('image'),
-  R.ifElse(
-    R.is(String),
-    R.identity,
-    R.pipe(
-      R.nth(-1),
-      R.prop('tags'),
-      R.nth(0)
-    )
-  )
-)
-
 const up = async (services, config, args) => {
   await build(services, config)
   return startServices(R.map(prepare)(services), config, args)

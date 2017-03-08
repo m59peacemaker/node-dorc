@@ -13,3 +13,16 @@ test('dockerOptionsToArray', t => {
   )
   t.end()
 })
+
+test('dockerOptionsToArray | false values are ignored', t => {
+  t.deepEqual(
+    toArray({
+      env: ['FOO=foo', 'FOO=bar bar'],
+      detach: false,
+      'no-healthcheck': true,
+      net: 'host'
+    }),
+    ['--env', 'FOO=foo', '--env', 'FOO=bar bar', '--no-healthcheck', '--net', 'host']
+  )
+  t.end()
+})

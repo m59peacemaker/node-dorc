@@ -1,8 +1,11 @@
 const R = require('ramda')
 
 const p = (k, v) => {
+  if (v === false) {
+    return []
+  }
   const result = ['--' + k]
-  if (typeof v !== 'boolean') {
+  if (v !== true) {
     result.push(v)
   }
   return result

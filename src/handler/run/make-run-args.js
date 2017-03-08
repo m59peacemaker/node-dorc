@@ -45,6 +45,8 @@ const removeNil = R.filter(R.complement(R.isNil))
 
 const findCmd = (a, b) => (b.cmd && b.cmd.length) ? b.cmd : (a.cmd || [])
 
+const lastItemFirstTag = R.pipe(R.nth(-1), R.prop('tags'), R.nth(0))
+
 const makeRunArgs = (
   service, // similiar to `args.docker` but with additional properties like `image`
   args = {}, // {docker: {env: 'FOO=foo', net: 'host'} cmd: [...commandParts]}
@@ -60,7 +62,6 @@ const makeRunArgs = (
     // move props that aren't for docker run from "service" to "dorc"
     moveProps(dorcArgs, R.lensProp('service'), R.lensProp('dorc')),
     // the rest are docker run options
-    // mergeProps(['service', 'options'], R.lensProp('options')),
     renameKeys({service: 'options'}),
     R.over(R.lensProp('options'), transformDockerOptions(propTransforms, dirs)),
     R.over(R.lensPath(['args', 'docker']), dockerOptionsToArray),
@@ -75,26 +76,11 @@ const makeRunArgs = (
       R.unapply(R.reduce(R.concat, [])),
       [
         R.prop('options'),
-        R.pipe(R.path(['dorc', 'image']), ensureArray),
+        R.pipe(R.path(['dorc', 'image']), R.when(R.is(Object), lastItemFirstTag), ensureArray),
         R.converge(findCmd, [R.prop('dorc'), R.prop('args')]),
       ]
     )
   )({service, args})
 }
-/*  R.pipe(
-    R.map(([key, value]) => getTransform(key)(value, key)),
-    R.flatten
-    //R.ifElse(() => R.isNil(detached.name), R.identity, R.assoc('name', name)),
-    //R.toPairs
-  )({service, options})
-  const _options = dockerRunProps.map(([key, value]) => {
-    return getTransform(key)(value, key)
-  })
-  const cmd = R.ifElse(R.isNil, R.F, R.identity)(service.cmd)
-  const detachedArg = R.ifElse(R.equals(false), R.identity, R.always('-d'))(detached)
-  const args = R.flatten(['-it', detachedArg, options, service.image, cmd])
-    .filter(v => v)
-  return args
-}*/
 
 module.exports = makeRunArgs
