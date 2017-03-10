@@ -39,7 +39,7 @@ const renameKeys = R.curry((keysMap, obj) =>
 const propOrPath = R.ifElse(R.isArrayLike, R.path, R.prop)
 const propsOrPaths = items => R.juxt(R.map(propOrPath, items))
 const concatAll = R.reduce(R.concat, [])
-const removeNil = R.filter(R.complement(R.isNil))
+const removeNil = R.reject(R.isNil)
 
 const findCmd = (a, b) => (b.cmd && b.cmd.length) ? b.cmd : (a.cmd || [])
 

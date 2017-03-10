@@ -4,7 +4,7 @@ const R = require('ramda')
 
 const _slices = (params, data) => params.map(p => data.slice(...p))
 const slices = R.curry(_slices)
-const removeWhitespaceItems = R.filter(R.complement(R.pipe(R.trim, R.isEmpty)))
+const removeWhitespaceItems = R.reject(R.pipe(R.trim, R.isEmpty))
 
 const ifNothingElse = value => R.ifElse(R.isNil, R.always(value), R.identity)
 const notNil = R.complement(R.isNil)
@@ -15,7 +15,7 @@ const getOptions = () => R.pipe(
   R.split('Options:\n'),
   R.nth(1),
   R.split('\n'),
-  R.filter(R.complement(R.isEmpty)),
+  R.reject(R.isEmpty),
   R.map(R.pipe(
     slices([[3, 4], [6, 36], [36]]),
     R.over(

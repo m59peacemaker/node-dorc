@@ -17,7 +17,7 @@ const separateDockerOpts = (dorcOpts, mixedOpts) => {
     options: R.pick(R.keys(dorcOpts), mixedOpts),
     docker: R.pipe(
       R.pick(R.keys(dockerRunOptions)),
-      R.filter(R.complement(R.equals(false))),
+      R.reject(R.equals(false)),
       R.merge(fixed)
     )(mixedOpts)
   }
