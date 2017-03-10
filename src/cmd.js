@@ -7,7 +7,6 @@ const {readFile} = require('mz/fs')
 const getConfig = require('./lib/get-config')
 const yargs = require('yargs')
 const format = require('chalk')
-const filterSelectedServices = require('./lib/filter-selected-services')
 const tryCatch = require('try_catch')
 const pad = require('~/lib/pad')
 const Help = require('~/lib/help')
@@ -35,12 +34,8 @@ const handler = async (name, args = {}) => {
     process.exit(0)
   }
   const config = await getConfig(process.cwd(), args.global.mode)
-  const selectedServices = filterSelectedServices(
-    config.prepared.services,
-    args.sub.services || [args.sub.service]
-  )
-  const handler = commands[name].handler
-  return handler(selectedServices, config, args.sub)
+  const handler = R.path([name, 'handler'], commands)
+  return handler(R.path(['prepared', 'services'], config), config, R.prop('sub', args))
 }
 
 const args = parseArgs(options, commands, process.argv.slice(2))

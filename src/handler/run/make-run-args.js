@@ -10,11 +10,9 @@ const mergeProps = require('~/lib/merge-props')
 const transformDockerOptions = require('~/lib/transform-docker-options')
 const dockerOptionsToArray = require('./docker-options-to-array')
 
-const ensureArray = v => Array.isArray(v) ? v : [v]
+const ensureArray = R.unless(R.isArrayLike, R.of)
 
-const dorcArgs = [
-  'mode',
-  'hooks',
+const dorcServiceProps = [
   'image',
   'cmd'
 ]
@@ -55,31 +53,33 @@ const makeRunArgs = (
     homedir: getHomedir()
   }
 ) => {
-  if (!service.image) {
-    throw new Error('service image is required')
-  }
   return R.pipe(
-    // move props that aren't for docker run from "service" to "dorc"
-    moveProps(dorcArgs, R.lensProp('service'), R.lensProp('dorc')),
+    // move props that aren't for docker run from "service.config" to "dorcRunProps"
+    R.converge(R.assoc('dorcRunProps'), [
+      R.pipe(R.path(['service', 'config']), R.pick(dorcServiceProps)),
+      R.identity
+    ]),
     // the rest are docker run options
-    renameKeys({service: 'options'}),
-    R.over(R.lensProp('options'), transformDockerOptions(propTransforms, dirs)),
+    R.converge(R.assoc('dockerRunOptions'), [
+      R.pipe(
+        R.path(['service', 'config']),
+        R.omit(dorcServiceProps),
+        transformDockerOptions(propTransforms, dirs)
+      ),
+      R.identity
+    ]),
     R.over(R.lensPath(['args', 'docker']), dockerOptionsToArray),
-    R.converge(
-      R.set(R.lensProp('options')),
-      [
-        R.pipe(propsOrPaths(['options', ['args', 'docker']]), concatAll),
-        R.identity
-      ]
-    ),
-    R.converge(
-      R.unapply(R.reduce(R.concat, [])),
-      [
-        R.prop('options'),
-        R.pipe(R.path(['dorc', 'image']), R.when(R.is(Object), lastItemFirstTag), ensureArray),
-        R.converge(findCmd, [R.prop('dorc'), R.prop('args')]),
-      ]
-    )
+    // concat "args.docker" to "dockerRunOptions"
+    R.converge(R.assoc('dockerRunOptions'), [
+      R.pipe(propsOrPaths(['dockerRunOptions', ['args', 'docker']]), concatAll),
+      R.identity
+    ]),
+    // concat "dockerRunOptions", "image", "cmd"
+    R.converge(R.unapply(R.reduce(R.concat, [])), [
+      R.prop('dockerRunOptions'),
+      R.pipe(R.path(['dorcRunProps', 'image']), R.when(R.is(Object), lastItemFirstTag), ensureArray),
+      R.converge(findCmd, [R.prop('dorcRunProps'), R.prop('args')]),
+    ])
   )({service, args})
 }
 

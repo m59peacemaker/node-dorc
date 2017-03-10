@@ -23,18 +23,16 @@ const cmdToArray = R.ifElse(
   R.over(R.lensProp('cmd'), spawnargs)
 )
 
-const normalize = R.over(
+const normalize = (config, project) => R.over(
   R.lensProp('services'),
   R.pipe(
-    R.toPairs,
-    R.map(
-      R.over(
-        R.lensIndex(1),
-        R.pipe(normalizeImage, cmdToArray)
-      )
-    ),
-    R.fromPairs
+    R.map(R.pipe(normalizeImage, cmdToArray)),
+    R.mapObjIndexed((v, k, obj) => ({
+      name: k,
+      container: `${project.name}_${k}`,
+      config: v
+    }))
   )
-)
+)(config)
 
 module.exports = normalize

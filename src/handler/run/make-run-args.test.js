@@ -18,7 +18,11 @@ test('throws if no service.image', t => {
 test('service.image', t => {
   t.plan(1)
   t.equal(
-    makeArgs({image}).join(' '),
+    makeArgs({
+      name: 'foo',
+      container: 'project_foo',
+      config: {image}
+    }).join(' '),
     image
   )
 })
@@ -26,10 +30,14 @@ test('service.image', t => {
 test('service.env', t => {
   t.plan(1)
   const service = {
-    image,
-    env: {
-      FOO: 'foo',
-      BAR: 'bar bar'
+    name: 'foo',
+    container: 'project_foo',
+    config: {
+      image,
+      env: {
+        FOO: 'foo',
+        BAR: 'bar bar'
+      }
     }
   }
   t.deepEqual(
@@ -41,11 +49,15 @@ test('service.env', t => {
 test('service.volumes', t => {
   t.plan(1)
   const service = {
-    image,
-    volumes: [
-      'foo:/app',
-      '~/tmp:/tmp'
-    ]
+    name: 'foo',
+    container: 'project_foo',
+    config: {
+      image,
+      volumes: [
+        'foo:/app',
+        '~/tmp:/tmp'
+      ]
+    }
   }
   t.deepEqual(
     makeArgs(service).join(' '),
@@ -56,8 +68,12 @@ test('service.volumes', t => {
 test('service.cmd', t => {
   t.plan(1)
   const service = {
-    image,
-    cmd: ['foo', 'bar', 'baz']
+    name: 'foo',
+    container: 'project_foo',
+    config: {
+      image,
+      cmd: ['foo', 'bar', 'baz']
+    }
   }
   t.deepEqual(
     makeArgs(service),
@@ -68,8 +84,12 @@ test('service.cmd', t => {
 test('service.cmd with quotes', t => {
   t.plan(1)
   const service = {
-    image,
-    cmd: ['/bin/sh', '-c', 'printf "fail"']
+    name: 'foo',
+    container: 'project_foo',
+    config: {
+      image,
+      cmd: ['/bin/sh', '-c', 'printf "fail"']
+    }
   }
   t.deepEqual(
     makeArgs(service),
@@ -80,15 +100,19 @@ test('service.cmd with quotes', t => {
 test('various', t => {
   t.plan(1)
   const service = {
-    image,
-    cmd: ['foo', 'bar'],
-    net: 'host',
-    env: {
-      FOO: 'foo foo'
-    },
-    volumes: [
-      '~/foo:/foo',
-    ]
+    name: 'foo',
+    container: 'project_foo',
+    config: {
+      image,
+      cmd: ['foo', 'bar'],
+      net: 'host',
+      env: {
+        FOO: 'foo foo'
+      },
+      volumes: [
+        '~/foo:/foo',
+      ]
+    }
   }
   t.deepEqual(
     makeArgs(service),
@@ -99,9 +123,13 @@ test('various', t => {
 test('basic options from service and cli args', t => {
   t.plan(1)
   const service = {
-    image,
-    env: {
-      FOO: 'foo foo'
+    name: 'foo',
+    container: 'project_foo',
+    config: {
+      image,
+      env: {
+        FOO: 'foo foo'
+      }
     }
   }
   t.deepEqual(

@@ -10,11 +10,7 @@ var omit = require('ramda/src/omit')
 var moveProps = function (toMove, fromLens, toLens) {
   return converge(
     function (propsToAdd, inputAfterOmit) {
-      return over(
-        toLens,
-        merge(__, propsToAdd),
-        inputAfterOmit
-      )
+      return over(toLens, merge(__, propsToAdd), inputAfterOmit)
     },
     [
       pipe(view(fromLens), pick(toMove)),

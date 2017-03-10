@@ -50,33 +50,18 @@ const getConfig = async (projectPath, mode) => {
   // merge config objects with mode specific objects,
   //   so that we have only the config for the given mode
   const modeConfig = getModeConfig(mode || parsed.defaultMode, parsed)
-  // filter services that don't have an image
-  const prepare = R.pipe(
-    R.over(
-      R.lensProp('services'),
-      R.filter(R.has('image'))
-    ),
-    /*R.lensProp('with')(
-      R.ifElse(
-        R.isNil,
-        Future.of,
-        futurizeP(paths => Promise.all(
-          paths.map(path => getConfig(path, mode || parsed.defaultMode))
-        ))
-      )
-    ),
-    R.map(normalizeConfig)*/
-    normalizeConfig
-  )
-
-  //const prepared = await promisifyF(prepare)(modeConfig)
-  const prepared = prepare(modeConfig)
+  const projectInfo = {
+    path: projectPath,
+    name: parsed.projectName
+  }
+  const prepared = R.pipe(
+    // filter services that don't have an image
+    R.over(R.lensProp('services'), R.filter(R.has('image'))),
+    config => normalizeConfig(config, projectInfo)
+  )(modeConfig)
 
   const projectConfig = {
-    project: {
-      path: projectPath,
-      name: parsed.projectName
-    },
+    project: projectInfo,
     locals,
     raw,
     parsed,
