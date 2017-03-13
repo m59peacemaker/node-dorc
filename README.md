@@ -4,6 +4,7 @@ A tool for orchestrating services with docker.
 
 (documentation coming one day...)
 
+my-project/dorc.yaml
 ```yaml
 locals: ./config.yaml
 defaultMode: development
@@ -13,15 +14,18 @@ services:
     cmd: darkness, my old friend
     volumes:
       - /tmp:/tmp
-    production:
-      net: host
-      cmd: Kitty
+    mode:
+      production:
+        net: host
+        cmd: Kitty
 ```
 
 ```sh
 $ dorc up hello
-dorc run --name {project-dir}_hello -v /tmp:/tmp pmkr/hello:1.0 darkness, my old friend
+dorc run --name my-project_hello -v /tmp:/tmp pmkr/hello:1.0 darkness, my old friend
+Hello, darkness my old friend
 
-$ dorc -m production up hello
-dorc run --name {project-dir}_hello -v /tmp:/tmp --net host pmkr/hello:1.0 Kitty
+$ DORC_MODE=production dorc up hello
+dorc run --name my-project_hello -v /tmp:/tmp --net host pmkr/hello:1.0 Kitty
+Hello, Kitty
 ```
