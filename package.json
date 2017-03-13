@@ -1,6 +1,6 @@
 {
   "name": "dorc",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "bin": {
     "dorc": "build/cmd.js"
   },

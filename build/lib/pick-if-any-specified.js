@@ -1,0 +1,10 @@
+var _require = require('ramda');
+
+const curry = _require.curry,
+      unless = _require.unless,
+      isEmpty = _require.isEmpty,
+      pick = _require.pick;
+
+
+module.exports = curry((keys, obj) => unless(_ => isEmpty(keys), pick(keys))(obj));
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi4uLy4uL3NyYy9saWIvcGljay1pZi1hbnktc3BlY2lmaWVkLmpzIl0sIm5hbWVzIjpbInJlcXVpcmUiLCJjdXJyeSIsInVubGVzcyIsImlzRW1wdHkiLCJwaWNrIiwibW9kdWxlIiwiZXhwb3J0cyIsImtleXMiLCJvYmoiLCJfIl0sIm1hcHBpbmdzIjoiZUFBdUNBLFFBQVEsT0FBUixDOztNQUFoQ0MsSyxZQUFBQSxLO01BQU9DLE0sWUFBQUEsTTtNQUFRQyxPLFlBQUFBLE87TUFBU0MsSSxZQUFBQSxJOzs7QUFFL0JDLE9BQU9DLE9BQVAsR0FBaUJMLE1BQU0sQ0FBQ00sSUFBRCxFQUFPQyxHQUFQLEtBQWVOLE9BQU9PLEtBQUtOLFFBQVFJLElBQVIsQ0FBWixFQUEyQkgsS0FBS0csSUFBTCxDQUEzQixFQUF1Q0MsR0FBdkMsQ0FBckIsQ0FBakIiLCJmaWxlIjoicGljay1pZi1hbnktc3BlY2lmaWVkLmpzIiwic291cmNlc0NvbnRlbnQiOlsiY29uc3Qge2N1cnJ5LCB1bmxlc3MsIGlzRW1wdHksIHBpY2t9ID0gcmVxdWlyZSgncmFtZGEnKVxuXG5tb2R1bGUuZXhwb3J0cyA9IGN1cnJ5KChrZXlzLCBvYmopID0+IHVubGVzcyhfID0+IGlzRW1wdHkoa2V5cyksIHBpY2soa2V5cykpKG9iaikpXG4iXX0=

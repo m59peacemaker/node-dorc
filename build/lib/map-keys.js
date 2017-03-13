@@ -1,0 +1,11 @@
+var _require = require('ramda');
+
+const curry = _require.curry,
+      keys = _require.keys,
+      map = _require.map,
+      values = _require.values,
+      zipObj = _require.zipObj;
+
+
+module.exports = curry((fn, obj) => zipObj(map(fn, keys(obj)), values(obj)));
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi4uLy4uL3NyYy9saWIvbWFwLWtleXMuanMiXSwibmFtZXMiOlsicmVxdWlyZSIsImN1cnJ5Iiwia2V5cyIsIm1hcCIsInZhbHVlcyIsInppcE9iaiIsIm1vZHVsZSIsImV4cG9ydHMiLCJmbiIsIm9iaiJdLCJtYXBwaW5ncyI6ImVBTUlBLFFBQVEsT0FBUixDOztNQUxBQyxLLFlBQUFBLEs7TUFDQUMsSSxZQUFBQSxJO01BQ0FDLEcsWUFBQUEsRztNQUNBQyxNLFlBQUFBLE07TUFDQUMsTSxZQUFBQSxNOzs7QUFHSkMsT0FBT0MsT0FBUCxHQUFpQk4sTUFBTSxDQUFDTyxFQUFELEVBQUtDLEdBQUwsS0FBYUosT0FBT0YsSUFBSUssRUFBSixFQUFRTixLQUFLTyxHQUFMLENBQVIsQ0FBUCxFQUEyQkwsT0FBT0ssR0FBUCxDQUEzQixDQUFuQixDQUFqQiIsImZpbGUiOiJtYXAta2V5cy5qcyIsInNvdXJjZXNDb250ZW50IjpbImNvbnN0IHtcbiAgICBjdXJyeSxcbiAgICBrZXlzLFxuICAgIG1hcCxcbiAgICB2YWx1ZXMsXG4gICAgemlwT2JqXG59ID0gcmVxdWlyZSgncmFtZGEnKVxuXG5tb2R1bGUuZXhwb3J0cyA9IGN1cnJ5KChmbiwgb2JqKSA9PiB6aXBPYmoobWFwKGZuLCBrZXlzKG9iaikpLCB2YWx1ZXMob2JqKSkpXG4iXX0=

@@ -1,0 +1,15 @@
+const singleServiceCommand = handler => {
+  return (services, config, args) => {
+    if (!args.service) {
+      throw new Error('No service name given'); // list service names
+    }
+    const service = services[args.service];
+    if (!service) {
+      throw new Error(`"${ args.service }" - no such service`);
+    }
+    return handler(service, config, args);
+  };
+};
+
+module.exports = singleServiceCommand;
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi4uLy4uL3NyYy9saWIvc2luZ2xlLXNlcnZpY2UtY29tbWFuZC5qcyJdLCJuYW1lcyI6WyJzaW5nbGVTZXJ2aWNlQ29tbWFuZCIsImhhbmRsZXIiLCJzZXJ2aWNlcyIsImNvbmZpZyIsImFyZ3MiLCJzZXJ2aWNlIiwiRXJyb3IiLCJtb2R1bGUiLCJleHBvcnRzIl0sIm1hcHBpbmdzIjoiQUFBQSxNQUFNQSx1QkFBdUJDLFdBQVc7QUFDdEMsU0FBTyxDQUFDQyxRQUFELEVBQVdDLE1BQVgsRUFBbUJDLElBQW5CLEtBQTRCO0FBQ2pDLFFBQUksQ0FBQ0EsS0FBS0MsT0FBVixFQUFtQjtBQUNqQixZQUFNLElBQUlDLEtBQUosQ0FBVSx1QkFBVixDQUFOLENBRGlCLENBQ3dCO0FBQzFDO0FBQ0QsVUFBTUQsVUFBVUgsU0FBU0UsS0FBS0MsT0FBZCxDQUFoQjtBQUNBLFFBQUksQ0FBQ0EsT0FBTCxFQUFjO0FBQ1osWUFBTSxJQUFJQyxLQUFKLENBQVcsS0FBR0YsS0FBS0MsT0FBUSxzQkFBM0IsQ0FBTjtBQUNEO0FBQ0QsV0FBT0osUUFBUUksT0FBUixFQUFpQkYsTUFBakIsRUFBeUJDLElBQXpCLENBQVA7QUFDRCxHQVREO0FBVUQsQ0FYRDs7QUFhQUcsT0FBT0MsT0FBUCxHQUFpQlIsb0JBQWpCIiwiZmlsZSI6InNpbmdsZS1zZXJ2aWNlLWNvbW1hbmQuanMiLCJzb3VyY2VzQ29udGVudCI6WyJjb25zdCBzaW5nbGVTZXJ2aWNlQ29tbWFuZCA9IGhhbmRsZXIgPT4ge1xuICByZXR1cm4gKHNlcnZpY2VzLCBjb25maWcsIGFyZ3MpID0+IHtcbiAgICBpZiAoIWFyZ3Muc2VydmljZSkge1xuICAgICAgdGhyb3cgbmV3IEVycm9yKCdObyBzZXJ2aWNlIG5hbWUgZ2l2ZW4nKSAvLyBsaXN0IHNlcnZpY2UgbmFtZXNcbiAgICB9XG4gICAgY29uc3Qgc2VydmljZSA9IHNlcnZpY2VzW2FyZ3Muc2VydmljZV1cbiAgICBpZiAoIXNlcnZpY2UpIHtcbiAgICAgIHRocm93IG5ldyBFcnJvcihgXCIke2FyZ3Muc2VydmljZX1cIiAtIG5vIHN1Y2ggc2VydmljZWApXG4gICAgfVxuICAgIHJldHVybiBoYW5kbGVyKHNlcnZpY2UsIGNvbmZpZywgYXJncylcbiAgfVxufVxuXG5tb2R1bGUuZXhwb3J0cyA9IHNpbmdsZVNlcnZpY2VDb21tYW5kXG4iXX0=

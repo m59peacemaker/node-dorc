@@ -1,0 +1,27 @@
+const Joi = require('joi');
+const image = require('./image');
+
+/* would love to get this working and use it in "service.mode" schema
+foo: fooSchema // if "foo" not here, then "foo" required under a AND b
+bar:
+  a:
+    foo: fooSchema // "foo" is optional here if present at top
+  b:
+    foo: fooSchema // "foo" is optional here if present at top
+*/
+
+const loose = Joi.object({
+  image: image.loose,
+  mode: Joi.object({
+    image: image.loose
+  }).unknown()
+}).unknown();
+
+const strict = loose.keys({
+  mode: Joi.any().forbidden() }).requiredKeys('image');
+
+module.exports = {
+  loose,
+  strict
+};
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi4uLy4uLy4uL3NyYy9zY2hlbWEvc2VydmljZS9pbmRleC5qcyJdLCJuYW1lcyI6WyJKb2kiLCJyZXF1aXJlIiwiaW1hZ2UiLCJsb29zZSIsIm9iamVjdCIsIm1vZGUiLCJ1bmtub3duIiwic3RyaWN0Iiwia2V5cyIsImFueSIsImZvcmJpZGRlbiIsInJlcXVpcmVkS2V5cyIsIm1vZHVsZSIsImV4cG9ydHMiXSwibWFwcGluZ3MiOiJBQUFBLE1BQU1BLE1BQU1DLFFBQVEsS0FBUixDQUFaO0FBQ0EsTUFBTUMsUUFBUUQsUUFBUSxTQUFSLENBQWQ7O0FBRUE7Ozs7Ozs7OztBQVNBLE1BQU1FLFFBQVFILElBQ1hJLE1BRFcsQ0FDSjtBQUNORixTQUFPQSxNQUFNQyxLQURQO0FBRU5FLFFBQU1MLElBQ0hJLE1BREcsQ0FDSTtBQUNORixXQUFPQSxNQUFNQztBQURQLEdBREosRUFJSEcsT0FKRztBQUZBLENBREksRUFTWEEsT0FUVyxFQUFkOztBQVdBLE1BQU1DLFNBQVNKLE1BQ1pLLElBRFksQ0FDUDtBQUNKSCxRQUFNTCxJQUFJUyxHQUFKLEdBQVVDLFNBQVYsRUFERixFQURPLEVBSVpDLFlBSlksQ0FJQyxPQUpELENBQWY7O0FBTUFDLE9BQU9DLE9BQVAsR0FBaUI7QUFDZlYsT0FEZTtBQUVmSTtBQUZlLENBQWpCIiwiZmlsZSI6ImluZGV4LmpzIiwic291cmNlc0NvbnRlbnQiOlsiY29uc3QgSm9pID0gcmVxdWlyZSgnam9pJylcbmNvbnN0IGltYWdlID0gcmVxdWlyZSgnLi9pbWFnZScpXG5cbi8qIHdvdWxkIGxvdmUgdG8gZ2V0IHRoaXMgd29ya2luZyBhbmQgdXNlIGl0IGluIFwic2VydmljZS5tb2RlXCIgc2NoZW1hXG5mb286IGZvb1NjaGVtYSAvLyBpZiBcImZvb1wiIG5vdCBoZXJlLCB0aGVuIFwiZm9vXCIgcmVxdWlyZWQgdW5kZXIgYSBBTkQgYlxuYmFyOlxuICBhOlxuICAgIGZvbzogZm9vU2NoZW1hIC8vIFwiZm9vXCIgaXMgb3B0aW9uYWwgaGVyZSBpZiBwcmVzZW50IGF0IHRvcFxuICBiOlxuICAgIGZvbzogZm9vU2NoZW1hIC8vIFwiZm9vXCIgaXMgb3B0aW9uYWwgaGVyZSBpZiBwcmVzZW50IGF0IHRvcFxuKi9cblxuY29uc3QgbG9vc2UgPSBKb2lcbiAgLm9iamVjdCh7XG4gICAgaW1hZ2U6IGltYWdlLmxvb3NlLFxuICAgIG1vZGU6IEpvaVxuICAgICAgLm9iamVjdCh7XG4gICAgICAgIGltYWdlOiBpbWFnZS5sb29zZVxuICAgICAgfSlcbiAgICAgIC51bmtub3duKClcbiAgfSlcbiAgLnVua25vd24oKVxuXG5jb25zdCBzdHJpY3QgPSBsb29zZVxuICAua2V5cyh7XG4gICAgbW9kZTogSm9pLmFueSgpLmZvcmJpZGRlbigpLCAvLyBzaG91bGQgaGF2ZSBiZWVuIGNvbGxhcHNlZCBhd2F5XG4gIH0pXG4gIC5yZXF1aXJlZEtleXMoJ2ltYWdlJylcblxubW9kdWxlLmV4cG9ydHMgPSB7XG4gIGxvb3NlLFxuICBzdHJpY3Rcbn1cbiJdfQ==

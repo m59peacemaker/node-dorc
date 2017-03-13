@@ -1,0 +1,27 @@
+var _require = require('child_process');
+
+const spawn = _require.spawn;
+
+var _require2 = require('tty');
+
+const isatty = _require2.isatty;
+
+const R = require('ramda');
+
+// TODO: custom output instead of the unhelpful docker output
+// is this parent (node process) needed or is `kexec` a good idea here?
+const exec = (container, options = {}) => {
+  if (!options.cmd) {
+    throw new Error('cmd required');
+  }
+  // TODO: promisify(spawn)
+  return new Promise((resolve, reject) => {
+    const args = R.pipe(_ => ['exec'], R.when(_ => isatty(), R.append('-it')), R.append(container), _ => R.concat(_, options.cmd))();
+    console.log('docker', args.join(' '));
+    const p = spawn('docker', args, { stdio: 'inherit' });
+    p.on('close', code => code !== 0 ? reject(code) : resolve());
+  });
+};
+
+module.exports = exec;
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi4uLy4uLy4uL3NyYy9oYW5kbGVyL2V4ZWMvaW5kZXguanMiXSwibmFtZXMiOlsicmVxdWlyZSIsInNwYXduIiwiaXNhdHR5IiwiUiIsImV4ZWMiLCJjb250YWluZXIiLCJvcHRpb25zIiwiY21kIiwiRXJyb3IiLCJQcm9taXNlIiwicmVzb2x2ZSIsInJlamVjdCIsImFyZ3MiLCJwaXBlIiwiXyIsIndoZW4iLCJhcHBlbmQiLCJjb25jYXQiLCJjb25zb2xlIiwibG9nIiwiam9pbiIsInAiLCJzdGRpbyIsIm9uIiwiY29kZSIsIm1vZHVsZSIsImV4cG9ydHMiXSwibWFwcGluZ3MiOiJlQUFnQkEsUUFBUSxlQUFSLEM7O01BQVRDLEssWUFBQUEsSzs7Z0JBQ1VELFFBQVEsS0FBUixDOztNQUFWRSxNLGFBQUFBLE07O0FBQ1AsTUFBTUMsSUFBSUgsUUFBUSxPQUFSLENBQVY7O0FBRUE7QUFDQTtBQUNBLE1BQU1JLE9BQU8sQ0FBQ0MsU0FBRCxFQUFZQyxVQUFVLEVBQXRCLEtBQTZCO0FBQ3hDLE1BQUksQ0FBQ0EsUUFBUUMsR0FBYixFQUFrQjtBQUNoQixVQUFNLElBQUlDLEtBQUosQ0FBVSxjQUFWLENBQU47QUFDRDtBQUNEO0FBQ0EsU0FBTyxJQUFJQyxPQUFKLENBQVksQ0FBQ0MsT0FBRCxFQUFVQyxNQUFWLEtBQXFCO0FBQ3RDLFVBQU1DLE9BQU9ULEVBQUVVLElBQUYsQ0FDWEMsS0FBSyxDQUFDLE1BQUQsQ0FETSxFQUVYWCxFQUFFWSxJQUFGLENBQU9ELEtBQUtaLFFBQVosRUFBc0JDLEVBQUVhLE1BQUYsQ0FBUyxLQUFULENBQXRCLENBRlcsRUFHWGIsRUFBRWEsTUFBRixDQUFTWCxTQUFULENBSFcsRUFJWFMsS0FBS1gsRUFBRWMsTUFBRixDQUFTSCxDQUFULEVBQVlSLFFBQVFDLEdBQXBCLENBSk0sR0FBYjtBQU1BVyxZQUFRQyxHQUFSLENBQVksUUFBWixFQUFzQlAsS0FBS1EsSUFBTCxDQUFVLEdBQVYsQ0FBdEI7QUFDQSxVQUFNQyxJQUFJcEIsTUFBTSxRQUFOLEVBQWdCVyxJQUFoQixFQUFzQixFQUFDVSxPQUFPLFNBQVIsRUFBdEIsQ0FBVjtBQUNBRCxNQUFFRSxFQUFGLENBQUssT0FBTCxFQUFjQyxRQUFRQSxTQUFTLENBQVQsR0FBYWIsT0FBT2EsSUFBUCxDQUFiLEdBQTRCZCxTQUFsRDtBQUNELEdBVk0sQ0FBUDtBQVdELENBaEJEOztBQWtCQWUsT0FBT0MsT0FBUCxHQUFpQnRCLElBQWpCIiwiZmlsZSI6ImluZGV4LmpzIiwic291cmNlc0NvbnRlbnQiOlsiY29uc3Qge3NwYXdufSA9IHJlcXVpcmUoJ2NoaWxkX3Byb2Nlc3MnKVxuY29uc3Qge2lzYXR0eX0gPSByZXF1aXJlKCd0dHknKVxuY29uc3QgUiA9IHJlcXVpcmUoJ3JhbWRhJylcblxuLy8gVE9ETzogY3VzdG9tIG91dHB1dCBpbnN0ZWFkIG9mIHRoZSB1bmhlbHBmdWwgZG9ja2VyIG91dHB1dFxuLy8gaXMgdGhpcyBwYXJlbnQgKG5vZGUgcHJvY2VzcykgbmVlZGVkIG9yIGlzIGBrZXhlY2AgYSBnb29kIGlkZWEgaGVyZT9cbmNvbnN0IGV4ZWMgPSAoY29udGFpbmVyLCBvcHRpb25zID0ge30pID0+IHtcbiAgaWYgKCFvcHRpb25zLmNtZCkge1xuICAgIHRocm93IG5ldyBFcnJvcignY21kIHJlcXVpcmVkJylcbiAgfVxuICAvLyBUT0RPOiBwcm9taXNpZnkoc3Bhd24pXG4gIHJldHVybiBuZXcgUHJvbWlzZSgocmVzb2x2ZSwgcmVqZWN0KSA9PiB7XG4gICAgY29uc3QgYXJncyA9IFIucGlwZShcbiAgICAgIF8gPT4gWydleGVjJ10sXG4gICAgICBSLndoZW4oXyA9PiBpc2F0dHkoKSwgUi5hcHBlbmQoJy1pdCcpKSxcbiAgICAgIFIuYXBwZW5kKGNvbnRhaW5lciksXG4gICAgICBfID0+IFIuY29uY2F0KF8sIG9wdGlvbnMuY21kKVxuICAgICkoKVxuICAgIGNvbnNvbGUubG9nKCdkb2NrZXInLCBhcmdzLmpvaW4oJyAnKSlcbiAgICBjb25zdCBwID0gc3Bhd24oJ2RvY2tlcicsIGFyZ3MsIHtzdGRpbzogJ2luaGVyaXQnfSlcbiAgICBwLm9uKCdjbG9zZScsIGNvZGUgPT4gY29kZSAhPT0gMCA/IHJlamVjdChjb2RlKSA6IHJlc29sdmUoKSlcbiAgfSlcbn1cblxubW9kdWxlLmV4cG9ydHMgPSBleGVjXG4iXX0=

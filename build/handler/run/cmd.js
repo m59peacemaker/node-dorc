@@ -1,0 +1,33 @@
+const sharedOptions = require('../../lib/shared-options');
+const parse = require('./parse');
+const run = require('./');
+
+const defaultArgs = { cmd: [], options: {}, docker: {} };
+/* args.docker keys are --names (not aliases)
+ * false values will be ignored
+ * values that can be declared multiple times can be strings or arrays
+ * {env: 'FOO=foo'} {env: ['FOO=foo', 'BAR=bar']}
+ */
+const handler = (services, config, args = defaultArgs) => {
+  if (!args.service) {
+    throw new Error('No service name given'); // list service names
+  }
+  const service = services[args.service];
+  if (!service) {
+    throw new Error(`"${ args.service }" - no such service`);
+  }
+  return run(service, args);
+};
+
+const command = {
+  usage: 'run [options...] <service> [cmd...]',
+  description: 'run service (also accepts all docker run options)',
+  options: {
+    dry: sharedOptions.dry
+  },
+  parse,
+  handler
+};
+
+module.exports = command;
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi4uLy4uLy4uL3NyYy9oYW5kbGVyL3J1bi9jbWQuanMiXSwibmFtZXMiOlsic2hhcmVkT3B0aW9ucyIsInJlcXVpcmUiLCJwYXJzZSIsInJ1biIsImRlZmF1bHRBcmdzIiwiY21kIiwib3B0aW9ucyIsImRvY2tlciIsImhhbmRsZXIiLCJzZXJ2aWNlcyIsImNvbmZpZyIsImFyZ3MiLCJzZXJ2aWNlIiwiRXJyb3IiLCJjb21tYW5kIiwidXNhZ2UiLCJkZXNjcmlwdGlvbiIsImRyeSIsIm1vZHVsZSIsImV4cG9ydHMiXSwibWFwcGluZ3MiOiJBQUFBLE1BQU1BLGdCQUFnQkMsUUFBUSwwQkFBUixDQUF0QjtBQUNBLE1BQU1DLFFBQVFELFFBQVEsU0FBUixDQUFkO0FBQ0EsTUFBTUUsTUFBTUYsUUFBUSxJQUFSLENBQVo7O0FBRUEsTUFBTUcsY0FBYyxFQUFDQyxLQUFLLEVBQU4sRUFBVUMsU0FBUyxFQUFuQixFQUF1QkMsUUFBUSxFQUEvQixFQUFwQjtBQUNBOzs7OztBQUtBLE1BQU1DLFVBQVUsQ0FBQ0MsUUFBRCxFQUFXQyxNQUFYLEVBQW1CQyxPQUFPUCxXQUExQixLQUEwQztBQUN4RCxNQUFJLENBQUNPLEtBQUtDLE9BQVYsRUFBbUI7QUFDakIsVUFBTSxJQUFJQyxLQUFKLENBQVUsdUJBQVYsQ0FBTixDQURpQixDQUN3QjtBQUMxQztBQUNELFFBQU1ELFVBQVVILFNBQVNFLEtBQUtDLE9BQWQsQ0FBaEI7QUFDQSxNQUFJLENBQUNBLE9BQUwsRUFBYztBQUNaLFVBQU0sSUFBSUMsS0FBSixDQUFXLEtBQUdGLEtBQUtDLE9BQVEsc0JBQTNCLENBQU47QUFDRDtBQUNELFNBQU9ULElBQUlTLE9BQUosRUFBYUQsSUFBYixDQUFQO0FBQ0QsQ0FURDs7QUFXQSxNQUFNRyxVQUFVO0FBQ2RDLFNBQU8scUNBRE87QUFFZEMsZUFBYSxtREFGQztBQUdkVixXQUFTO0FBQ1BXLFNBQUtqQixjQUFjaUI7QUFEWixHQUhLO0FBTWRmLE9BTmM7QUFPZE07QUFQYyxDQUFoQjs7QUFVQVUsT0FBT0MsT0FBUCxHQUFpQkwsT0FBakIiLCJmaWxlIjoiY21kLmpzIiwic291cmNlc0NvbnRlbnQiOlsiY29uc3Qgc2hhcmVkT3B0aW9ucyA9IHJlcXVpcmUoJ34vbGliL3NoYXJlZC1vcHRpb25zJylcbmNvbnN0IHBhcnNlID0gcmVxdWlyZSgnLi9wYXJzZScpXG5jb25zdCBydW4gPSByZXF1aXJlKCcuLycpXG5cbmNvbnN0IGRlZmF1bHRBcmdzID0ge2NtZDogW10sIG9wdGlvbnM6IHt9LCBkb2NrZXI6IHt9fVxuLyogYXJncy5kb2NrZXIga2V5cyBhcmUgLS1uYW1lcyAobm90IGFsaWFzZXMpXG4gKiBmYWxzZSB2YWx1ZXMgd2lsbCBiZSBpZ25vcmVkXG4gKiB2YWx1ZXMgdGhhdCBjYW4gYmUgZGVjbGFyZWQgbXVsdGlwbGUgdGltZXMgY2FuIGJlIHN0cmluZ3Mgb3IgYXJyYXlzXG4gKiB7ZW52OiAnRk9PPWZvbyd9IHtlbnY6IFsnRk9PPWZvbycsICdCQVI9YmFyJ119XG4gKi9cbmNvbnN0IGhhbmRsZXIgPSAoc2VydmljZXMsIGNvbmZpZywgYXJncyA9IGRlZmF1bHRBcmdzKSA9PiB7XG4gIGlmICghYXJncy5zZXJ2aWNlKSB7XG4gICAgdGhyb3cgbmV3IEVycm9yKCdObyBzZXJ2aWNlIG5hbWUgZ2l2ZW4nKSAvLyBsaXN0IHNlcnZpY2UgbmFtZXNcbiAgfVxuICBjb25zdCBzZXJ2aWNlID0gc2VydmljZXNbYXJncy5zZXJ2aWNlXVxuICBpZiAoIXNlcnZpY2UpIHtcbiAgICB0aHJvdyBuZXcgRXJyb3IoYFwiJHthcmdzLnNlcnZpY2V9XCIgLSBubyBzdWNoIHNlcnZpY2VgKVxuICB9XG4gIHJldHVybiBydW4oc2VydmljZSwgYXJncylcbn1cblxuY29uc3QgY29tbWFuZCA9IHtcbiAgdXNhZ2U6ICdydW4gW29wdGlvbnMuLi5dIDxzZXJ2aWNlPiBbY21kLi4uXScsXG4gIGRlc2NyaXB0aW9uOiAncnVuIHNlcnZpY2UgKGFsc28gYWNjZXB0cyBhbGwgZG9ja2VyIHJ1biBvcHRpb25zKScsXG4gIG9wdGlvbnM6IHtcbiAgICBkcnk6IHNoYXJlZE9wdGlvbnMuZHJ5XG4gIH0sXG4gIHBhcnNlLFxuICBoYW5kbGVyXG59XG5cbm1vZHVsZS5leHBvcnRzID0gY29tbWFuZFxuIl19

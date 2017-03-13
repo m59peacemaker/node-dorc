@@ -1,0 +1,14 @@
+const options = {
+  dry: {
+    type: 'boolean',
+    description: 'print only dry run'
+  },
+  detach: {
+    type: 'boolean',
+    description: "don't follow service output",
+    alias: ['d']
+  }
+};
+
+module.exports = options;
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi4uLy4uL3NyYy9saWIvc2hhcmVkLW9wdGlvbnMuanMiXSwibmFtZXMiOlsib3B0aW9ucyIsImRyeSIsInR5cGUiLCJkZXNjcmlwdGlvbiIsImRldGFjaCIsImFsaWFzIiwibW9kdWxlIiwiZXhwb3J0cyJdLCJtYXBwaW5ncyI6IkFBQUEsTUFBTUEsVUFBVTtBQUNkQyxPQUFLO0FBQ0hDLFVBQU0sU0FESDtBQUVIQyxpQkFBYTtBQUZWLEdBRFM7QUFLZEMsVUFBUTtBQUNORixVQUFNLFNBREE7QUFFTkMsaUJBQWEsNkJBRlA7QUFHTkUsV0FBTyxDQUFDLEdBQUQ7QUFIRDtBQUxNLENBQWhCOztBQVlBQyxPQUFPQyxPQUFQLEdBQWlCUCxPQUFqQiIsImZpbGUiOiJzaGFyZWQtb3B0aW9ucy5qcyIsInNvdXJjZXNDb250ZW50IjpbImNvbnN0IG9wdGlvbnMgPSB7XG4gIGRyeToge1xuICAgIHR5cGU6ICdib29sZWFuJyxcbiAgICBkZXNjcmlwdGlvbjogJ3ByaW50IG9ubHkgZHJ5IHJ1bidcbiAgfSxcbiAgZGV0YWNoOiB7XG4gICAgdHlwZTogJ2Jvb2xlYW4nLFxuICAgIGRlc2NyaXB0aW9uOiBcImRvbid0IGZvbGxvdyBzZXJ2aWNlIG91dHB1dFwiLFxuICAgIGFsaWFzOiBbJ2QnXVxuICB9XG59XG5cbm1vZHVsZS5leHBvcnRzID0gb3B0aW9uc1xuIl19
