@@ -18,12 +18,15 @@ const parseArgs = (options, commands, args) => {
   const {_: remA, ...global} = argParse(args, options, {stopEarly: true})
   const [commandName, ...remB] = remA
   if (!commands[commandName]) {
-    throw new Error(`no such command "${commandName}"`)
+    return {
+      global
+    }
   }
   const command = R.assoc('name', commandName, commands[commandName])
   const sub = command.parse ? command.parse(remB, command.options) : {}
   return {
-    command: commandName,
+    commandName,
+    command,
     global,
     sub
   }

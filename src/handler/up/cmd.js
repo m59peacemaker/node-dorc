@@ -1,38 +1,16 @@
+const R = require('ramda')
 const minimist = require('minimist')
 const sharedOptions = require('~/lib/shared-options')
-const imageToTag = require('~/lib/image-to-tag')
-const R = require('ramda')
-const {spawn} = require('child_process')
-const build = require('~/handler/build')
-const run = require('~/handler/run')
-const follow = require('~/handler/follow')
 const pickIfAnySpecified = require('~/lib/pick-if-any-specified')
-const needsBuild = require('~/lib/service/needs-build')
+const up = require('./')
 
 const parse = (args, options) => {
   return {services: minimist(args)._}
 }
 
-const up = (services, options = {}) => R.map(service => {
-  return needsBuild(service) ? build(service, {dry: options.dry}) : Promise.resolve()
-    .then(() => run(
-      imageToTag(service),
-      {
-        cmd: [],
-        options: {},
-        docker: {detach: true, name: service.container}
-      }
-      ))
-      .then(() => {
-        if (options.detach !== true) {
-          return follow(service, {})
-        }
-      })
-})(services)
-
 const handler = (services, config, args) => {
   const selectedServices = pickIfAnySpecified(args.services, services)
-  return up(selectedServices, {})
+  return R.compose(_ => Promise.all(_), R.values, R.map(_ => up(_, {})))(selectedServices)
 }
 
 const command = {

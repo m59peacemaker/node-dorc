@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 
+// TODO: add "quiet" mode
 require('source-map-support').install()
 
 const {spawn} = require('child_process')
 const {readFile} = require('mz/fs')
 const getConfig = require('./lib/get-config')
-const yargs = require('yargs')
 const format = require('chalk')
 const tryCatch = require('try_catch')
 const pad = require('~/lib/pad')
@@ -18,28 +18,35 @@ const parseArgs = require('~/lib/parse-args')
 const commands = require('./commands')
 const options = require('./options')
 
-process.on('unhandledRejection', (reason) => {
-  console.error('unhandled rejection:'.toUpperCase())
-  throw reason
-})
-
 const showHelp = () => console.log(pad.vertical(
   1,
   Help('dorc [dorc-options...] <command> [command-options...]', options, commands)
 ))
 
-const handler = async (name, args = {}) => {
-  if (args.global.help === true) { // TODO: sub command help
+const handle = (options = {}) => {
+  if (options.global.help === true) { // TODO: sub command help
     showHelp()
     process.exit(0)
   }
-  const config = await getConfig(process.cwd(), args.global.mode)
-  const handler = R.path([name, 'handler'], commands)
-  return handler(R.path(['prepared', 'services'], config), config, R.prop('sub', args))
+  if (!options.commandName) {
+    throw new Error('no command given')
+  }
+  if (!commands[options.commandName]) {
+    throw new Error(`no such command "${options.commandName}"`)
+  }
+  if (options.sub.help === true) {
+    // show sub help
+  }
+  return getConfig(process.cwd(), options.global.mode)
+    .then(config => options.command.handler(
+      R.path(['prepared', 'services'], config),
+      config,
+      R.prop('sub', options)
+    ))
 }
 
-const args = parseArgs(options, commands, process.argv.slice(2))
-handler(args.command, args)
+handle(parseArgs(options, commands, process.argv.slice(2)))
+  .catch(err => err.message && console.error(err.message))
 
 /* const assertCmdValid = (cmd) => { */
 /*   if (cmd === undefined) { */

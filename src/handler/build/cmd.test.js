@@ -20,7 +20,7 @@ test('build command builds images for given service', t => {
       hello:
         image:
           file: ./Dockerfile
-          tags:
+          tag:
             - dorc-build-test1
             - dorc-build-test2
   `
@@ -56,11 +56,11 @@ test('build command builds images for all services', t => {
       dolly:
         image:
           file: ./dolly
-          tags: dorc-build-test-dolly
+          tag: dorc-build-test-dolly
       adele:
         image:
           file: ./adele
-          tags: dorc-build-test-adele
+          tag: dorc-build-test-adele
   `
   setup(config)
   outputFile(joinPath(tmpDir, '/dolly'), `
@@ -100,7 +100,7 @@ test('build command dry run', t => {
       hello:
         image:
           file: ./Dockerfile
-          tags: dorc-build-test-dry
+          tag: dorc-build-test-dry
   `
   setup(config)
   execAsync(`${cmd} build --dry hello --colors`, {cwd: tmpDir})

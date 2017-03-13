@@ -26,7 +26,7 @@ const getImagesThatMatch = tags => Promise.all(
 )
 
 const buildImageAndRemoveDangling = async (work, image) => {
-  const imagesThatMatchTags = (await getImagesThatMatch(image.tags))
+  const imagesThatMatchTags = (await getImagesThatMatch(image.tag))
     .filter(v => v !== undefined)
   await work.buildImage(makeBuildArgs(image))
   await removeDangling(work.removeDangling, imagesThatMatchTags)

@@ -4,7 +4,7 @@ const expandTilde = require('expand-tilde')
 const Transform = require('~/lib/transform-docker-options')
 
 const propTransforms = {
-  tags: value => {
+  tag: value => {
     return value.map(v => {
       if (Array.isArray(v)) {
         return R.flatten(v.map(tag => ['--tag', tag]))

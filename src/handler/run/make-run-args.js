@@ -9,6 +9,7 @@ const moveProps = require('~/lib/move-props')
 const mergeProps = require('~/lib/merge-props')
 const transformDockerOptions = require('~/lib/transform-docker-options')
 const dockerOptionsToArray = require('./docker-options-to-array')
+const getMainTag = require('~/lib/get-main-tag')
 
 const ensureArray = R.unless(R.isArrayLike, R.of)
 
@@ -43,8 +44,6 @@ const removeNil = R.reject(R.isNil)
 
 const findCmd = (a, b) => (b.cmd && b.cmd.length) ? b.cmd : (a.cmd || [])
 
-const lastItemFirstTag = R.pipe(R.nth(-1), R.prop('tags'), R.nth(0))
-
 const makeRunArgs = (
   service, // similiar to `args.docker` but with additional properties like `image`
   args = {}, // {docker: {env: 'FOO=foo', net: 'host'} cmd: [...commandParts]}
@@ -77,7 +76,7 @@ const makeRunArgs = (
     // concat "dockerRunOptions", "image", "cmd"
     R.converge(R.unapply(R.reduce(R.concat, [])), [
       R.prop('dockerRunOptions'),
-      R.pipe(R.path(['dorcRunProps', 'image']), R.when(R.is(Object), lastItemFirstTag), ensureArray),
+      R.pipe(R.path(['dorcRunProps', 'image']), getMainTag, ensureArray),
       R.converge(findCmd, [R.prop('dorcRunProps'), R.prop('args')]),
     ])
   )({service, args})

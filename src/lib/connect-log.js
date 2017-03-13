@@ -12,7 +12,6 @@ function Next (array) {
 const nextColor = Next(colors)
 
 const connect = (name) => {
-  console.log(name)
   const color = nextColor()
   const p = spawn('docker', ['logs', '--follow', name])
   p.stdout

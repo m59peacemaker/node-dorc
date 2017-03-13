@@ -1,5 +1,14 @@
-// TODO: automate this someFn('./handler')
-const commands = ['build', 'run', 'up'].reduce((acc, v) => {
+// TODO: automate this mebbe? requireList(array)
+const commands = [
+  'build',
+  'up',
+  'down',
+  'restart',
+  'follow',
+  'exec',
+  'run',
+  'rmi'
+].reduce((acc, v) => {
   acc[v] = require(`~/handler/${v}/cmd`)
   return acc
 }, {})

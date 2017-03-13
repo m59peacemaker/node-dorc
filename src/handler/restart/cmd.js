@@ -1,5 +1,5 @@
 const R = require('ramda')
-const follow = require('./')
+const restart = require('./')
 const minimist = require('minimist')
 const pickIfAnySpecified = require('~/lib/pick-if-any-specified')
 
@@ -9,16 +9,14 @@ const parse = (args, options) => {
 
 const handler = (services, config, args = {}) => {
   return R.pipe(
-    _ => pickIfAnySpecified(args.services, _),
-    R.map(service => follow(service, args)),
-    R.values,
-    _ => Promise.all(_)
+    pickIfAnySpecified(args.services),
+    R.map(restart)
   )(services)
 }
 
 module.exports = {
-  usage: 'follow [docker log options...] [services...]',
-  description: 'shortcut for "dorc logs --follow"',
+  usage: 'restart <services...>',
+  description: 'stop running service(s), then start service(s)',
   parse,
   handler
 }

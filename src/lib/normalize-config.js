@@ -12,7 +12,7 @@ const normalizeImage = R.ifElse(
     R.identity,
     R.pipe(
       ensureArray,
-      R.map(R.over(R.lensProp('tags'), ensureArray))
+      R.map(R.over(R.lensProp('tag'), ensureArray))
     )
   ))
 )

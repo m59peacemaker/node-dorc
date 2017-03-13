@@ -1,5 +1,5 @@
-const {compose, not, isNil, path} = require('ramda')
+const {pipe, path, either, is} = require('ramda')
 
-const needsBuild = compose(not, isNil, path(['image', 'tags']))
+const needsBuild = pipe(path(['config', 'image']), either(is(Object), Array.isArray))
 
 module.exports = needsBuild
