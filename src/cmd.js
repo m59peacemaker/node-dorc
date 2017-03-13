@@ -37,7 +37,7 @@ const handle = (options = {}) => {
   if (options.sub.help === true) {
     // show sub help
   }
-  return getConfig(process.cwd(), options.global.mode)
+  return getConfig(process.cwd(), options.global.mode || process.env.DORC_MODE)
     .then(config => options.command.handler(
       R.path(['prepared', 'services'], config),
       config,
