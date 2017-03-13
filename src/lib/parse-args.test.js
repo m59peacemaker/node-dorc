@@ -3,6 +3,7 @@ const parseArgs = require('./parse-args')
 const run = require('~/handler/run')
 const options = require('~/options')
 const commands = require('~/commands')
+const R = require('ramda')
 
 test('parse args' , t => {
   t.plan(1)
@@ -16,7 +17,8 @@ test('parse args' , t => {
       ]
     ),
     {
-      command: 'run',
+      commandName: 'run',
+      command: R.assoc('name', 'run', commands.run),
       global: {help: false, mode: 'dev'},
       sub: {
         options: {
