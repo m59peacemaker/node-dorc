@@ -6,6 +6,8 @@
   },
   "scripts": {
     "build": "rm -r ./build; babel ./src --out-dir ./build --copy-files --source-maps inline",
+    "lint": "eslint src",
+    "pretest": "npm run lint",
     "test": "tape './build/**/*.test.js'",
     "build-test": "npm run build && npm run test",
     "watch": "onchange -i src -- npm run build-test --silent"
@@ -45,6 +47,12 @@
     "babel-plugin-transform-es2015-destructuring": "^6.18.0",
     "babel-plugin-transform-object-rest-spread": "^6.16.0",
     "babel-preset-es2017": "^6.16.0",
+    "eslint": "^4.9.0",
+    "eslint-config-standard": "^10.2.1",
+    "eslint-plugin-import": "^2.7.0",
+    "eslint-plugin-node": "^5.2.0",
+    "eslint-plugin-promise": "^3.6.0",
+    "eslint-plugin-standard": "^3.0.1",
     "onchange": "^3.0.2",
     "output-file-sync": "^1.1.2",
     "rimraf": "^2.6.0",
