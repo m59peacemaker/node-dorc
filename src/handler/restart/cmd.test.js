@@ -1,8 +1,8 @@
-const {
-  test,
-  cmd,
-  tmpDir,
-  setup,
-  cleanup,
-  execAsync
-} = require('~/test')
+/* const { */
+/*   test, */
+/*   cmd, */
+/*   tmpDir, */
+/*   setup, */
+/*   cleanup, */
+/*   execAsync */
+/* } = require('~/test') */

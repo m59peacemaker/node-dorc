@@ -8,26 +8,26 @@ test('getTags', t => {
     'string image doesn\'t count'
   )
   t.deepEqual(
-    getTags.fromImage({tag: 'food'}),
-    ['food'],
+    getTags.fromImage({ tag: 'food' }),
+    [ 'food' ],
     'image object, string tag'
   )
   t.deepEqual(
-    getTags({config: {image: {tag: 'food'}}}),
-    ['food'],
+    getTags({ config: { image: { tag: 'food' } } }),
+    [ 'food' ],
     'from service object'
   )
   t.deepEqual(
-    getTags.fromImage({tag: ['ham', 'burgers']}),
-    ['ham', 'burgers'],
+    getTags.fromImage({ tag: [ 'ham', 'burgers' ] }),
+    [ 'ham', 'burgers' ],
     'image object, array tag'
   )
   t.deepEqual(
     getTags.fromImage([
-      {tag: ['ham', 'burgers']},
-      {tag: 'pizza'}
+      { tag: [ 'ham', 'burgers' ] },
+      { tag: 'pizza' }
     ]),
-    ['ham', 'burgers', 'pizza'],
+    [ 'ham', 'burgers', 'pizza' ],
     'array of images, string and array tags'
   )
   t.end()

@@ -1,6 +1,4 @@
-const {exec, execSync, spawn} = require('child_process')
 const util = require('util')
-const docker = require('~/lib/docker-api')
 const {
   test,
   cmd,
@@ -19,8 +17,8 @@ test('"run {service}" runs service with default command', t => {
         image: pmkr/hello:1.0
   `
   setup(config)
-  execAsync(`${cmd} run hello`, {cwd: tmpDir})
-    .then(([stdout, stderr]) => {
+  execAsync(`${cmd} run hello`, { cwd: tmpDir })
+    .then(([ stdout, stderr ]) => {
       console.log('stdout:', stdout)
       console.error('stderr:', stderr)
       if (stderr === '' && stdout.split('\n').includes('Hello, World!')) {
@@ -41,8 +39,8 @@ test('"run {service} {cmd}" runs service with {cmd}"', t => {
         image: pmkr/hello:1.0
   `
   setup(config)
-  execAsync(`${cmd} run hello Darkness, my old friend`, {cwd: tmpDir})
-    .then(([stdout, stderr]) => {
+  execAsync(`${cmd} run hello Darkness, my old friend`, { cwd: tmpDir })
+    .then(([ stdout, stderr ]) => {
       if (stderr === '' && stdout.split('\n').includes('Hello, Darkness, my old friend')) {
         t.pass()
       } else {
@@ -66,8 +64,8 @@ test('multi-line, complicated, quote-ridden command', t => {
   setup(config)
   const lines = Array(3).fill(true).map((_, i) => i + 1).join('\n')
   const shCmd = `${cmd} run foo -c "printf '${lines}'"`
-  execAsync(shCmd, {cwd: tmpDir})
-    .then(([stdout, stderr]) => {
+  execAsync(shCmd, { cwd: tmpDir })
+    .then(([ stdout, stderr ]) => {
       console.log('stdout:\n', util.inspect(stdout))
       console.log(util.inspect(lines))
       if (stderr.length) {
@@ -89,8 +87,8 @@ test('"dorc run" accepts "docker run" options', t => {
         cmd: /bin/sh -c "printf \\"$FOO\\""
   `
   setup(config)
-  execFileAsync(cmd, ['run', '--rm', '-e', 'FOO=yo dud', 'foo'], {cwd: tmpDir})
-    .then(([stdout, stderr]) => {
+  execFileAsync(cmd, [ 'run', '--rm', '-e', 'FOO=yo dud', 'foo' ], { cwd: tmpDir })
+    .then(([ stdout, stderr ]) => {
       console.log(stdout, stderr)
       const lines = stdout.split('\n')
       t.equal(lines.slice(-1).join(''), 'yo dud')
@@ -110,8 +108,8 @@ test('"dorc run" uses command from cli args', t => {
         cmd: printf "fail"
   `
   setup(config)
-  execFileAsync(cmd, ['run', '--rm', '-e', 'FOO=yo dud', 'foo', '/bin/sh', '-c', 'printf "$FOO"'], {cwd: tmpDir})
-    .then(([stdout, stderr]) => {
+  execFileAsync(cmd, [ 'run', '--rm', '-e', 'FOO=yo dud', 'foo', '/bin/sh', '-c', 'printf "$FOO"' ], { cwd: tmpDir })
+    .then(([ stdout, stderr ]) => {
       console.log(stdout, stderr)
       const lines = stdout.split('\n')
       t.equal(lines.slice(-1).join(''), 'yo dud')

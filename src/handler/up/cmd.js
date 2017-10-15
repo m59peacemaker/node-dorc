@@ -5,7 +5,7 @@ const pickIfAnySpecified = require('~/lib/pick-if-any-specified')
 const up = require('./')
 
 const parse = (args, options) => {
-  return {services: minimist(args)._}
+  return { services: minimist(args)._ }
 }
 
 const handler = (services, config, args) => {

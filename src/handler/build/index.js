@@ -1,18 +1,17 @@
 const R = require('ramda')
-const {spawn, exec} = require('child_process')
+const { spawn } = require('child_process')
 const docker = require('~/lib/docker-api')
 const spawnMock = require('mock-spawn')()
 const makeBuildArgs = require('./make-build-args')
 const promisifyProcess = require('~/lib/promisify-process')
 const Display = require('~/lib/display')
-const format = require('chalk')
-const pickIfAnySpecified = require('~/lib/pick-if-any-specified')
 
 const removeDangling = (remover, images) => Promise.all(
   images.map(image => docker.getImage(image.Id)
     .then(info => {
       if (!info.RepoTags.length) { // no longer tagged (is dangling)
-        remover(imageId, oldTags)
+        // TODO: this code is broken
+        // remover(image, oldTags)
       }
       return Promise.resolve()
     })
@@ -21,7 +20,7 @@ const removeDangling = (remover, images) => Promise.all(
 
 const getImagesThatMatch = tags => Promise.all(
   tags
-    .map(tag => docker.getImage(tag).catch(err => undefined))
+    .map(tag => docker.getImage(tag).catch(() => undefined))
     .filter(v => v !== undefined)
 )
 
@@ -48,12 +47,12 @@ const Work = R.curry((effects, display) => {
       display.info(
         `Removing dangling image ${image.Id}, previously tagged "${oldTags.join(' ')}"`
       )
-      return effects.rmi(imageId)
+      return effects.rmi(image.Id)
         .then(() => display.info(`Image ${image.Id} removed`))
     },
     buildImage: args => {
       display.distinct(`docker build ${args.join(' ')}`)
-      const process = effects.spawn('docker', ['build', ...args])
+      const process = effects.spawn('docker', [ 'build', ...args ])
       process.stdout.on('data', display.info)
       process.stderr.on('data', display.err)
       return promisifyProcess(process)

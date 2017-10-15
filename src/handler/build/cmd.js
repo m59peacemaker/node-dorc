@@ -6,11 +6,10 @@ const pickIfAnySpecified = require('~/lib/pick-if-any-specified')
 const build = require('./')
 
 const isNotEmptyArray = R.both(R.isArrayLike, R.complement(R.isEmpty))
-const defaultOptions = {services: [], args: {}}
 const handler = (services, config, options) => {
   return R.pipe(
     _ => pickIfAnySpecified(options.services, _),
-    R.filter(R.pipe(R.path(['config', 'image']), isNotEmptyArray)),
+    R.filter(R.pipe(R.path([ 'config', 'image' ]), isNotEmptyArray)),
     R.map(_ => build(_, options.args)),
     R.values,
     _ => Promise.all(_)
@@ -25,8 +24,8 @@ module.exports = {
   },
   parse: (args, options) => {
     const minimistOpts = prepOptionsForMinimist(options)
-    const {_: services, ...opts} = minimist(args, minimistOpts)
-    return {services, args: opts}
+    const { _: services, ...opts } = minimist(args, minimistOpts)
+    return { services, args: opts }
   },
   handler
 }

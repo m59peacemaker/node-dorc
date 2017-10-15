@@ -2,12 +2,12 @@ const options = {
   mode: {
     type: 'string',
     description: 'use given mode specific config',
-    alias: ['m']
+    alias: [ 'm' ]
   },
   help: {
     type: 'boolean',
     description: 'show help menu',
-    alias: ['h']
+    alias: [ 'h' ]
   }
 }
 

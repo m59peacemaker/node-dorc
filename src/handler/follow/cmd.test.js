@@ -16,15 +16,15 @@ test.skip('follow', t => {
         image: alpine
   `
   setup(config)
-  const lines = Array(20).fill(true).map((_, i) => i + 1).join('\n')
+  // const lines = Array(20).fill(true).map((_, i) => i + 1).join('\n')
   const shCmd = `${cmd}  up foo`
-  execAsync(shCmd, {cwd: tmpDir})
+  execAsync(shCmd, { cwd: tmpDir })
     .then(() => {
       const p = execAsync(`${cmd} follow `)
       return p
     })
-    .then(([stdout, stderr]) => {
-      
+    .then(([ stdout, stderr ]) => {
+
     })
     .catch(t.fail)
     .then(cleanup)

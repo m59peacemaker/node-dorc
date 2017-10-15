@@ -4,7 +4,7 @@ const arrayOfStrings = Joi.array().items(Joi.string())
 
 const looseObject = Joi
   .object({
-    tag: [Joi.string(), arrayOfStrings],
+    tag: [ Joi.string(), arrayOfStrings ],
     file: Joi.string(),
     args: Joi.object().pattern(/.+/, stringOrNumber),
     context: Joi.string()

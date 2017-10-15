@@ -1,11 +1,11 @@
 const R = require('ramda')
-const {all: merge} = require('deepmerge')
+const { all: merge } = require('deepmerge')
 
 const collapseObjToMode = (mode, obj) => {
   return merge([
     {},
     R.dissoc('mode', obj),
-    R.defaultTo({}, R.view(R.lensPath(['mode', mode]), obj))
+    R.defaultTo({}, R.view(R.lensPath([ 'mode', mode ]), obj))
   ])
 }
 

@@ -3,8 +3,8 @@ const R = require('ramda')
 const prepOptionsForMinimist = R.pipe(
   R.toPairs,
   R.reduce(
-    (acc, [name, v]) => {
-      ;['string', 'boolean'].forEach(type => {
+    (acc, [ name, v ]) => {
+      ;[ 'string', 'boolean' ].forEach(type => {
         if (v.type === type && !name.match(/^no-/)) {
           acc[type].push(name)
         }
@@ -14,7 +14,7 @@ const prepOptionsForMinimist = R.pipe(
       }
       return acc
     },
-    {string: [], boolean: [], alias: {}}
+    { string: [], boolean: [], alias: {} }
   )
 )
 

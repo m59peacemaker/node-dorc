@@ -6,7 +6,7 @@ const options = {
   detach: {
     type: 'boolean',
     description: "don't follow service output",
-    alias: ['d']
+    alias: [ 'd' ]
   }
 }
 

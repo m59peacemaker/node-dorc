@@ -1,14 +1,11 @@
 const path = require('path')
-const {readFile} = require('mz/fs')
-const {safeLoad: parseYAML} = require('js-yaml')
+const { readFile } = require('mz/fs')
+const { safeLoad: parseYAML } = require('js-yaml')
 const interpolate = require('interpol8')
 const interpolateShell = require('./interpolate-shell')
 const getModeConfig = require('./get-mode-config')
 const R = require('ramda')
 const normalizeConfig = require('./normalize-config')
-const {Future} = require('ramda-fantasy')
-const promisifyF = require('promisify-f')
-const futurizeP = require('futurize-p')(Future)
 const configSchema = require('~/schema/config')
 
 const getDefaults = (projectPath) => ({
@@ -21,7 +18,7 @@ const getLocals = (localsFile) => {
   }
   return readFile(localsFile)
     .then(raw => parseYAML(raw))
-    .catch(err => ({}))
+    .catch(() => ({}))
 }
 
 const interpolateConfig = async (raw, locals) => {

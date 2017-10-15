@@ -6,13 +6,13 @@ const fromImageObject = R.pipe(
 )
 
 const fromImage = R.cond([
-  [R.is(String), R.always([])], // image: 'foo' -> []
-  [Array.isArray, R.pipe(R.map(fromImageObject), R.flatten)],
-  [R.is(Object), fromImageObject] // image: {tag: 'foo'} -> ['foo']
+  [ R.is(String), R.always([]) ], // image: 'foo' -> []
+  [ Array.isArray, R.pipe(R.map(fromImageObject), R.flatten) ],
+  [ R.is(Object), fromImageObject ] // image: {tag: 'foo'} -> ['foo']
 ])
 
 const getTags = R.pipe(
-  R.path(['config', 'image']),
+  R.path([ 'config', 'image' ]),
   fromImage
 )
 

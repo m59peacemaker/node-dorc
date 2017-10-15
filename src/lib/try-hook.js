@@ -10,7 +10,7 @@ const tryHook = (hookName, config) => {
   if (R.not(R.contains(hookName, validHooks))) {
     throw new Error(`"${hookName}" is not a supported hook`)
   }
-  const hook = R.view(R.lensPath(['hooks', hookName]), config)
+  const hook = R.view(R.lensPath([ 'hooks', hookName ]), config)
   return R.ifElse(
     () => R.isNil(hook),
     () => Promise.resolve(),

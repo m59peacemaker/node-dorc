@@ -1,7 +1,7 @@
 const R = require('ramda')
 const spawnargs = require('parse-spawn-args').parse
 
-const wrapInArray = (v) => [v]
+const wrapInArray = (v) => [ v ]
 const ensureArray = R.ifElse(Array.isArray, R.identity, wrapInArray)
 
 const normalizeImage = R.ifElse(

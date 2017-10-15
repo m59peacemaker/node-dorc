@@ -2,7 +2,7 @@ const sharedOptions = require('~/lib/shared-options')
 const parse = require('./parse')
 const run = require('./')
 
-const defaultArgs = {cmd: [], options: {}, docker: {}}
+const defaultArgs = { cmd: [], options: {}, docker: {} }
 /* args.docker keys are --names (not aliases)
  * false values will be ignored
  * values that can be declared multiple times can be strings or arrays

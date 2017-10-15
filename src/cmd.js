@@ -3,17 +3,10 @@
 // TODO: add "quiet" mode
 require('source-map-support').install()
 
-const {spawn} = require('child_process')
-const {readFile} = require('mz/fs')
 const getConfig = require('./lib/get-config')
-const format = require('chalk')
-const tryCatch = require('try_catch')
 const pad = require('~/lib/pad')
 const Help = require('~/lib/help')
 const R = require('ramda')
-const wrapInQuotes = v => `"${v}"`
-const quoteSpaced = v => v.includes(' ') ? wrapInQuotes(v) : v
-const zipObjRest = R.curry(require('~/lib/zip-obj-rest'))
 const parseArgs = require('~/lib/parse-args')
 const commands = require('./commands')
 const options = require('./options')
@@ -39,7 +32,7 @@ const handle = (options = {}) => {
   }
   return getConfig(process.cwd(), options.global.mode || process.env.DORC_MODE)
     .then(config => options.command.handler(
-      R.path(['prepared', 'services'], config),
+      R.path([ 'prepared', 'services' ], config),
       config,
       R.prop('sub', options)
     ))

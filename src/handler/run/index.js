@@ -1,6 +1,6 @@
 const R = require('ramda')
-const {spawn} = require('child_process')
-const {isatty} = require('tty')
+const { spawn } = require('child_process')
+const { isatty } = require('tty')
 const makeRunArgs = require('./make-run-args')
 
 const stringToArray = R.when(R.is(String), R.of)
@@ -16,18 +16,18 @@ const addArgs = R.mergeWithKey(R.pipe(
   )
 ))
 
-const defaultArgs = {cmd: [], options: {}, docker: {}}
+const defaultArgs = { cmd: [], options: {}, docker: {} }
 
 const run = (service, args = defaultArgs) => {
   args.docker = R.pipe(
-    R.when(_ => isatty(1), addArgs({interactive: true, tty: true})),
+    R.when(_ => isatty(1), addArgs({ interactive: true, tty: true })),
     R.unless(R.compose(R.equals(true), R.prop('detach')), R.assoc('rm', true))
   )(args.docker)
-  const runArgs = ['run', ...makeRunArgs(service, args)]
+  const runArgs = [ 'run', ...makeRunArgs(service, args) ]
   // TODO: runArgs need formatting for string usage (double quote values with spaces)
   console.log(`docker ${runArgs.join(' ')}`)
   return new Promise((resolve, reject) => {
-    const p = spawn('docker', runArgs, {stdio: 'inherit'})
+    const p = spawn('docker', runArgs, { stdio: 'inherit' })
     // TODO: make/use a module for promisfying a process, this does not handle all cases
     // TODO: nicer error handling, see `dorc run foo /bin/sh`, run a failing command, then exit
     p.on('close', code => code !== 0 ? reject(code) : resolve())

@@ -3,7 +3,6 @@ const minimist = require('minimist')
 const dockerRunOptions = require('./docker-run-options')
 const keysMatching = require('~/lib/keys-matching')
 const mapKeys = require('~/lib/map-keys')
-const zipObjRest = R.curry(require('~/lib/zip-obj-rest'))
 const prepOptionsForMinimist = require('~/lib/prep-options-for-minimist')
 
 const separateDockerOpts = (dorcOpts, mixedOpts) => {
@@ -24,11 +23,11 @@ const separateDockerOpts = (dorcOpts, mixedOpts) => {
 }
 
 const parse = (args, options) => {
-  const minimistOpts = prepOptionsForMinimist(R.mergeAll([options, dockerRunOptions]))
-  const {_: remaining, ...parsed} = minimist(args, {...minimistOpts, stopEarly: true})
+  const minimistOpts = prepOptionsForMinimist(R.mergeAll([ options, dockerRunOptions ]))
+  const { _: remaining, ...parsed } = minimist(args, { ...minimistOpts, stopEarly: true })
   const separate = separateDockerOpts(options, parsed)
-  const [service, ...cmd] = remaining
-  return {service, cmd, ...separate}
+  const [ service, ...cmd ] = remaining
+  return { service, cmd, ...separate }
 }
 
 module.exports = parse

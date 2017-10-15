@@ -6,11 +6,9 @@ const {
   cleanup,
   execAsync
 } = require('~/test')
-const {execSync} = require('child_process')
+const { execSync } = require('child_process')
 const outputFile = require('output-file-sync')
-const {join: joinPath} = require('path')
-const run = require('~/handler/run')
-const build = require('./')
+const { join: joinPath } = require('path')
 const docker = require('~/lib/docker-api')
 
 test('build command builds images for given service', t => {
@@ -30,11 +28,11 @@ test('build command builds images for given service', t => {
   `
   setup(config)
   outputFile(joinPath(tmpDir, '/Dockerfile'), Dockerfile)
-  execAsync(`${cmd} build hello --colors`, {cwd: tmpDir})
-    .then(([stdout, stderr]) => console.log(stdout, stderr))
+  execAsync(`${cmd} build hello --colors`, { cwd: tmpDir })
+    .then(([ stdout, stderr ]) => console.log(stdout, stderr))
     .then(() => Promise.all(
-      [1, 2].map(idx => execAsync(`docker run --rm dorc-build-test${idx}`)
-        .then(([stdout, stderr]) => {
+      [ 1, 2 ].map(idx => execAsync(`docker run --rm dorc-build-test${idx}`)
+        .then(([ stdout, stderr ]) => {
           if (stdout.trim() === 'Hello, Dolly') {
             t.pass(stdout)
           } else {
@@ -71,14 +69,14 @@ test('build command builds images for all services', t => {
     FROM pmkr/hello:1.0
     CMD ["from the other side"]
   `)
-  execAsync(`${cmd} build --colors`, {cwd: tmpDir})
-    .then(([stdout, stderr]) => console.log(stdout))
+  execAsync(`${cmd} build --colors`, { cwd: tmpDir })
+    .then(([ stdout, stderr ]) => console.log(stdout))
     .then(() => Promise.all(
       [
-        {name: 'dolly', target: 'Dolly'},
-        {name: 'adele', target: 'from the other side'}
+        { name: 'dolly', target: 'Dolly' },
+        { name: 'adele', target: 'from the other side' }
       ].map(item => execAsync(`docker run --rm dorc-build-test-${item.name}`)
-        .then(([stdout, stderr]) => {
+        .then(([ stdout, stderr ]) => {
           if (stdout.trim() === `Hello, ${item.target}`) {
             t.pass(stdout)
           } else {
@@ -103,10 +101,10 @@ test('build command dry run', t => {
           tag: dorc-build-test-dry
   `
   setup(config)
-  execAsync(`${cmd} build --dry hello --colors`, {cwd: tmpDir})
-    .then(([stdout, stderr]) => {
+  execAsync(`${cmd} build --dry hello --colors`, { cwd: tmpDir })
+    .then(([ stdout, stderr ]) => {
       console.log(stdout, stderr)
-      return docker.getImage('dorc-build-test-dry').catch(err => undefined)
+      return docker.getImage('dorc-build-test-dry').catch(() => undefined)
         .then(image => {
           if (image) {
             t.fail('created the image on dry run')
