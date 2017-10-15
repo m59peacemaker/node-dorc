@@ -21,7 +21,7 @@ test('service.image', t => {
     makeArgs({
       name: 'foo',
       container: 'project_foo',
-      config: {image}
+      config: { image }
     }).join(' '),
     image
   )
@@ -42,7 +42,7 @@ test('service.env', t => {
   }
   t.deepEqual(
     makeArgs(service),
-    ['-e', 'FOO=foo', '-e', 'BAR=bar bar', image]
+    [ '-e', 'FOO=foo', '-e', 'BAR=bar bar', image ]
   )
 })
 
@@ -72,12 +72,12 @@ test('service.cmd', t => {
     container: 'project_foo',
     config: {
       image,
-      cmd: ['foo', 'bar', 'baz']
+      cmd: [ 'foo', 'bar', 'baz' ]
     }
   }
   t.deepEqual(
     makeArgs(service),
-    [image, 'foo', 'bar', 'baz']
+    [ image, 'foo', 'bar', 'baz' ]
   )
 })
 
@@ -88,12 +88,12 @@ test('service.cmd with quotes', t => {
     container: 'project_foo',
     config: {
       image,
-      cmd: ['/bin/sh', '-c', 'printf "fail"']
+      cmd: [ '/bin/sh', '-c', 'printf "fail"' ]
     }
   }
   t.deepEqual(
     makeArgs(service),
-    [image, '/bin/sh', '-c', 'printf "fail"']
+    [ image, '/bin/sh', '-c', 'printf "fail"' ]
   )
 })
 
@@ -104,19 +104,19 @@ test('various', t => {
     container: 'project_foo',
     config: {
       image,
-      cmd: ['foo', 'bar'],
+      cmd: [ 'foo', 'bar' ],
       net: 'host',
       env: {
         FOO: 'foo foo'
       },
       volumes: [
-        '~/foo:/foo',
+        '~/foo:/foo'
       ]
     }
   }
   t.deepEqual(
     makeArgs(service),
-    ['--net', 'host', '-e', 'FOO=foo foo', '-v', `${os.homedir()}/foo:/foo`, image, 'foo', 'bar']
+    [ '--net', 'host', '-e', 'FOO=foo foo', '-v', `${os.homedir()}/foo:/foo`, image, 'foo', 'bar' ]
   )
 })
 
@@ -133,7 +133,7 @@ test('basic options from service and cli args', t => {
     }
   }
   t.deepEqual(
-    makeArgs(service, {docker: {env: 'FOO=bar bar'}}),
-    ['-e', 'FOO=foo foo', '--env', 'FOO=bar bar', image]
+    makeArgs(service, { docker: { env: 'FOO=bar bar' } }),
+    [ '-e', 'FOO=foo foo', '--env', 'FOO=bar bar', image ]
   )
 })

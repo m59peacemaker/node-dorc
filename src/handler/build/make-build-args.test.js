@@ -15,7 +15,7 @@ test('file and tags', t => {
   t.equal(
     makeArgs({
       file: './Dockerfile',
-      tag: ['foo']
+      tag: [ 'foo' ]
     }).join(' '),
     '--file ./Dockerfile --tag foo ./'
   )

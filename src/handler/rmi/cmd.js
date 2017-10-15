@@ -6,7 +6,7 @@ const needsBuild = require('~/lib/service/needs-build')
 
 // TODO: Prompt to verify images to be deleted! [Y/n]
 const parse = (args, options) => {
-  return {services: minimist(args)._}
+  return { services: minimist(args)._ }
 }
 
 const handler = (services, config, args = {}) => {

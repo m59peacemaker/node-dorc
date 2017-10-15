@@ -23,7 +23,7 @@ const loose = Joi
 
 const strict = loose
   .keys({
-    mode: Joi.any().forbidden(), // should have been collapsed away
+    mode: Joi.any().forbidden() // should have been collapsed away
   })
   .requiredKeys('image')
 

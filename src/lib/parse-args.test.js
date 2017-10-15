@@ -1,11 +1,10 @@
 const test = require('tape')
 const parseArgs = require('./parse-args')
-const run = require('~/handler/run')
 const options = require('~/options')
 const commands = require('~/commands')
 const R = require('ramda')
 
-test('parse args' , t => {
+test('parse args', t => {
   t.plan(1)
   t.deepEqual(
     parseArgs(
@@ -19,18 +18,18 @@ test('parse args' , t => {
     {
       commandName: 'run',
       command: R.assoc('name', 'run', commands.run),
-      global: {help: false, mode: 'dev'},
+      global: { help: false, mode: 'dev' },
       sub: {
         options: {
-          dry: true,
+          dry: true
         },
         docker: {
-          env: ['FOO=foo', 'FOO=bar bar'],
+          env: [ 'FOO=foo', 'FOO=bar bar' ],
           detach: true,
           'no-healthcheck': true
         },
         service: 'foo',
-        cmd: ['doit', 'toit']
+        cmd: [ 'doit', 'toit' ]
       }
     }
   )

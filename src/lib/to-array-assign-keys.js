@@ -1,7 +1,7 @@
-var toArrayAssignKeys = function (toProp, object) {
+const toArrayAssignKeys = function (toProp, object) {
   return Object.keys(object).map(function (k) {
-    var value = object[k]
-    var newObject = Object.assign({}, value)
+    const value = object[k]
+    const newObject = Object.assign({}, value)
     newObject[toProp] = k
     return newObject
   })

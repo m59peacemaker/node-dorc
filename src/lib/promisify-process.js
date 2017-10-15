@@ -1,11 +1,10 @@
-const promisifyProcess = function (process) {
-  return new Promise(function (resolve, reject) {
-    process.on('error', function (err) {
-      reject(err)
-    })
-    process.on('close', function (exitCode) {
-      exitCode !== 0 ? reject({exitCode}) : resolve({exitCode})
-    })
+const promisifyProcess = process => {
+  return new Promise((resolve, reject) => {
+    process.on('error', reject)
+    process.on(
+      'close',
+      exitCode => exitCode !== 0 ? reject(new Error({ exitCode })) : resolve({ exitCode })
+    )
   })
 }
 

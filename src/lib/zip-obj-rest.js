@@ -1,8 +1,8 @@
-var zipObjRest = function (keys, values) {
+const zipObjRest = function (keys, values) {
   return values.reduce(function (result, v, idx) {
-    var key = keys[idx]
+    let key = keys[idx]
     if (idx === keys.length - 1) {
-      result[key] = [v]
+      result[key] = [ v ]
     } else if (key) {
       result[key] = v
     } else {

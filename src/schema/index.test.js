@@ -10,42 +10,42 @@ const tests = {
   image: {
     good: [
       'some-tag',
-      {tag: 'foo', file: './Dockerfile'},
-      {tag: ['foo', 'bar'], file: './Dockerfile'},
-      {tag: 'foo', file: './Dockerfile'},
-      {tag: 'foo', args: {foo: 'bar', bar: 132}, file: './Dockerfile'},
-      {tag: 'foo', context: './hue', file: './Dockerfile'},
-      [{tag: 'foo', file: './Dockerfile'}, {tag: ['foo', 'bar'], file: 'whatver.file'}],
-      [{tag: 'foo', file: 'first'}, {tag: ['foo', 'bar'], file: '/second.file'}],
+      { tag: 'foo', file: './Dockerfile' },
+      { tag: [ 'foo', 'bar' ], file: './Dockerfile' },
+      { tag: 'foo', file: './Dockerfile' },
+      { tag: 'foo', args: { foo: 'bar', bar: 132 }, file: './Dockerfile' },
+      { tag: 'foo', context: './hue', file: './Dockerfile' },
+      [ { tag: 'foo', file: './Dockerfile' }, { tag: [ 'foo', 'bar' ], file: 'whatver.file' } ],
+      [ { tag: 'foo', file: 'first' }, { tag: [ 'foo', 'bar' ], file: '/second.file' } ]
     ],
     bad: [
       123,
       '',
       false,
-      {tag: 'foo'},
-      {file: './Dockerfile'},
-      {tag: 123, file: './Dockerfile'},
-      {tag: {}, file: './Dockerfile'},
-      {tag: '', file: './Dockerfile'},
-      {tag: true, file: './Dockerfile'},
-      {tag: false, file: './Dockerfile'},
-      {tag: 'foo', file: 123},
-      {tag: 'foo', file: ''},
-      {tag: 'foo', file: './Dockerfile', args: {foo: {}}},
-      {tag: 'foo', file: './Dockerfile', args: {foo: []}},
-      {tag: 'foo', file: './Dockerfile', context: {}},
-      {tag: 'foo', file: './Dockerfile', context: true},
-      ['foo', 'bar']
+      { tag: 'foo' },
+      { file: './Dockerfile' },
+      { tag: 123, file: './Dockerfile' },
+      { tag: {}, file: './Dockerfile' },
+      { tag: '', file: './Dockerfile' },
+      { tag: true, file: './Dockerfile' },
+      { tag: false, file: './Dockerfile' },
+      { tag: 'foo', file: 123 },
+      { tag: 'foo', file: '' },
+      { tag: 'foo', file: './Dockerfile', args: { foo: {} } },
+      { tag: 'foo', file: './Dockerfile', args: { foo: [] } },
+      { tag: 'foo', file: './Dockerfile', context: {} },
+      { tag: 'foo', file: './Dockerfile', context: true },
+      [ 'foo', 'bar' ]
     ]
   },
   service: {
     good: [
-      {net: 'host', env: {FOO: 'bar'}, image: 'alpine'},
+      { net: 'host', env: { FOO: 'bar' }, image: 'alpine' },
       {
         user: 1000,
         image: [
-          {tag: 'foo', file: 'docker'},
-          {tag: ['foo', 'bar'], file: 'foo/Dockerfile'}
+          { tag: 'foo', file: 'docker' },
+          { tag: [ 'foo', 'bar' ], file: 'foo/Dockerfile' }
         ]
       }
     ],
@@ -53,7 +53,7 @@ const tests = {
       true,
       '123',
       [],
-      {image: ['foo', 'bar']}
+      { image: [ 'foo', 'bar' ] }
     ]
   },
   config: {
@@ -70,7 +70,7 @@ const tests = {
               FOO: 'bar',
               image: {
                 file: './Dockerfile',
-                tag: ['foo', 'bar']
+                tag: [ 'foo', 'bar' ]
               }
             }
           }
@@ -78,9 +78,9 @@ const tests = {
       }
     ],
     bad: [
-      {defaultMode: []},
-      {locals: {}},
-      {services: {foo: {image: {}}}}
+      { defaultMode: [] },
+      { locals: {} },
+      { services: { foo: { image: {} } } }
     ]
   }
 }
@@ -90,11 +90,11 @@ Object.keys(tests).forEach(type => {
   const typeTests = tests[type]
   test(`schema | config-mode-expanded | ${type}`, t => {
     typeTests.good.forEach(data => {
-      const {error, result} = schema.validate(data)
+      const { error } = schema.validate(data)
       error ? console.log(data) && t.fail(error) : t.pass()
     })
     typeTests.bad.forEach(data => {
-      const {error, result} = schema.validate(data)
+      const { error } = schema.validate(data)
       if (error) {
         t.pass()
       } else {

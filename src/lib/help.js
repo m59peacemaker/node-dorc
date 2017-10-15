@@ -1,6 +1,6 @@
-const {curry, flip, pipe, map, pick, values} = require('ramda')
+const { curry, flip, pipe, map, pick, values } = require('ramda')
 const columnify = curry(flip(require('columnify')))
-const columns = columnify({showHeaders: false})
+const columns = columnify({ showHeaders: false })
 const prefixLines = curry(require('~/lib/prefix-lines'))
 const toArrayAssignKeys = curry(require('~/lib/to-array-assign-keys'))
 
@@ -14,12 +14,12 @@ const prepareArgKeys = option => {
 }
 
 const Help = (usage, options, commands) => {
-  const sections = [['Usage: ' + usage]]
+  const sections = [ [ 'Usage: ' + usage ] ]
   sections.push([
     'Commands:',
     pipe(
       values,
-      map(pick(['usage', 'description'])),
+      map(pick([ 'usage', 'description' ])),
       columns,
       prefixLines('  ')
     )(commands)
