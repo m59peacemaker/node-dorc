@@ -10,7 +10,7 @@
     "build-test": "npm run build && npm run test",
     "watch": "onchange -i src -- npm run build-test --silent"
   },
-  "license": "VOL",
+  "license": "CC0-1.0",
   "dependencies": {
     "array-next": "0.0.1",
     "chalk": "^1.1.3",
